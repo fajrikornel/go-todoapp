@@ -19,3 +19,10 @@ docker-compose up -d
 go build -o build/migrate cmd/migrate/migrate.go
 build/migrate
 ```
+
+### Start the server
+
+```
+go build -o build/server cmd/server/server.go
+build/server
+```

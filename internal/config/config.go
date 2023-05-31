@@ -6,6 +6,7 @@ import (
 )
 
 type Config struct {
+	AppPort    int    `yaml:"APP_PORT"`
 	DbHost     string `yaml:"DB_HOST"`
 	DbName     string `yaml:"DB_NAME"`
 	DbPort     int    `yaml:"DB_PORT"`
