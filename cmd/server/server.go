@@ -24,7 +24,8 @@ func main() {
 	}
 
 	projectRepository := repository.NewProjectRepository(store)
-	router := server.GetRouter(projectRepository)
+	itemRepository := repository.NewItemRepository(store)
+	router := server.GetRouter(projectRepository, itemRepository)
 
 	addr := fmt.Sprintf(":%d", conf.AppPort)
 
