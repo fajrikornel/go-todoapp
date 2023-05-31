@@ -13,13 +13,13 @@ import (
 )
 
 type CreateItemRequestBody struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Name        *string `json:"name"`
+	Description *string `json:"description"`
 }
 
 type CreateItemResponseBody struct {
 	Success bool `json:"success"`
-	ItemID  uint `json:"item_id"`
+	ItemID  uint `json:"item_id,omitempty"`
 }
 
 func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
@@ -33,7 +33,7 @@ func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 			return
 		}
 
-		if requestBody.Name == "" || requestBody.Description == "" {
+		if requestBody.Name == nil || requestBody.Description == nil {
 			responseBody := CreateItemResponseBody{Success: false}
 			utils.ReturnErrorResponse(w, 400, responseBody, errors.New("invalid_format"))
 			return
@@ -41,8 +41,8 @@ func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 
 		projectId, _ := strconv.Atoi(p.ByName("projectId"))
 		item := models.Item{
-			Name:        requestBody.Name,
-			Description: requestBody.Description,
+			Name:        *requestBody.Name,
+			Description: *requestBody.Description,
 			ProjectID:   uint(projectId),
 		}
 
