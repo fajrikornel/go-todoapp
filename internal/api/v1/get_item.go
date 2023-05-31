@@ -2,7 +2,6 @@ package v1
 
 import (
 	"github.com/fajrikornel/go-todoapp/internal/api/utils"
-	"github.com/fajrikornel/go-todoapp/internal/models"
 	"github.com/fajrikornel/go-todoapp/internal/repository"
 	"github.com/julienschmidt/httprouter"
 	"log"
@@ -11,8 +10,14 @@ import (
 )
 
 type GetItemResponseBody struct {
-	Success bool         `json:"success"`
-	Item    *models.Item `json:"item"`
+	Success bool                 `json:"success"`
+	Item    DetailedItemResponse `json:"item"`
+}
+
+type DetailedItemResponse struct {
+	ItemID      uint   `json:"item_id,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
 }
 
 func GetItemHandler(repository repository.ItemRepository) httprouter.Handle {
@@ -29,7 +34,11 @@ func GetItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		}
 
 		log.Printf("Success getting item: %v", item)
-		responseBody := GetItemResponseBody{Success: true, Item: item}
+		responseBody := GetItemResponseBody{Success: true, Item: DetailedItemResponse{
+			ItemID:      item.ID,
+			Name:        item.Name,
+			Description: item.Description,
+		}}
 		utils.ReturnSuccessResponse(w, responseBody)
 	}
 }
