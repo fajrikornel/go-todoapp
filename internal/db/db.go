@@ -31,3 +31,12 @@ func GetSqlStore(conf *config.Config) (SqlStore, error) {
 func (s *SqlStore) DoMigrations() error {
 	return s.db.AutoMigrate(&models.Project{}, &models.Item{})
 }
+
+func (s *SqlStore) Create(model interface{}) error {
+	tx := s.db.Create(model)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	return nil
+}
