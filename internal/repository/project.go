@@ -7,6 +7,7 @@ import (
 
 type ProjectRepository interface {
 	Create(project *models.Project) error
+	FindById(id int) (*models.Project, error)
 }
 
 type projectRepository struct {
@@ -26,4 +27,14 @@ func (p *projectRepository) Create(project *models.Project) error {
 	}
 
 	return nil
+}
+
+func (p *projectRepository) FindById(id int) (*models.Project, error) {
+	project := &models.Project{}
+	tx := p.sqlStore.Db.Preload("Items").First(project, id)
+	if tx.Error != nil {
+		return project, tx.Error
+	}
+
+	return project, nil
 }

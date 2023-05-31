@@ -15,6 +15,7 @@ func GetRouter(pRepository repository.ProjectRepository, iRepository repository.
 	router.GET("/", middleware.LoggingMiddleware(api.PingHandler))
 	router.POST("/v1/projects", middleware.LoggingMiddleware(v1.CreateProjectHandler(pRepository)))
 	router.POST("/v1/projects/:projectId", middleware.LoggingMiddleware(v1.CreateItemHandler(iRepository)))
+	router.GET("/v1/projects/:projectId", middleware.LoggingMiddleware(v1.GetProjectHandler(pRepository)))
 
 	return router
 }

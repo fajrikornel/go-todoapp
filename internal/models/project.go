@@ -5,8 +5,8 @@ import (
 )
 
 type Project struct {
-	gorm.Model
-	Name        string
-	Description string
-	Items       []Item
+	gorm.Model  `json:"-"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Items       []Item `json:"items"`
 }
