@@ -7,6 +7,7 @@ import (
 
 type ItemRepository interface {
 	Create(item *models.Item) error
+	FindByProjectIdAndItemId(projectId, itemId int) (*models.Item, error)
 }
 
 type itemRepository struct {
@@ -26,4 +27,14 @@ func (i *itemRepository) Create(item *models.Item) error {
 	}
 
 	return nil
+}
+
+func (i *itemRepository) FindByProjectIdAndItemId(projectId, itemId int) (*models.Item, error) {
+	var item models.Item
+	tx := i.sqlStore.Db.Where(&models.Item{ProjectID: uint(projectId), ID: uint(itemId)}).First(&item)
+	if tx.Error != nil {
+		return &item, tx.Error
+	}
+
+	return &item, nil
 }

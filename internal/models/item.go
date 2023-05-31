@@ -5,8 +5,9 @@ import (
 )
 
 type Item struct {
-	gorm.Model  `json:"-"`
+	ID          uint   `json:"item_id"`
+	ProjectID   uint   `json:"-"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
-	ProjectID   uint   `json:"-"`
+	gorm.Model  `json:"-"`
 }
