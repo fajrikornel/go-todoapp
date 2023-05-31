@@ -12,13 +12,13 @@ import (
 )
 
 type CreateProjectRequestBody struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Name        *string `json:"name"`
+	Description *string `json:"description"`
 }
 
 type CreateProjectResponseBody struct {
 	Success   bool `json:"success"`
-	ProjectID uint `json:"project_id"`
+	ProjectID uint `json:"project_id,omitempty"`
 }
 
 func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Handle {
@@ -32,15 +32,15 @@ func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 			return
 		}
 
-		if requestBody.Name == "" || requestBody.Description == "" {
+		if requestBody.Name == nil || requestBody.Description == nil {
 			responseBody := CreateProjectResponseBody{Success: false}
 			utils.ReturnErrorResponse(w, 400, responseBody, errors.New("invalid_format"))
 			return
 		}
 
 		project := models.Project{
-			Name:        requestBody.Name,
-			Description: requestBody.Description,
+			Name:        *requestBody.Name,
+			Description: *requestBody.Description,
 		}
 
 		err = repository.Create(&project)
