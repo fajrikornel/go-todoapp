@@ -12,7 +12,19 @@ import (
 
 type GetProjectResponseBody struct {
 	Success bool            `json:"success"`
-	Project *models.Project `json:"project"`
+	Project ProjectResponse `json:"project,omitempty"`
+}
+
+type ProjectResponse struct {
+	ProjectID   uint           `json:"project_id,omitempty"`
+	Name        string         `json:"name,omitempty"`
+	Description string         `json:"description,omitempty"`
+	Items       []ItemResponse `json:"items,omitempty"`
+}
+
+type ItemResponse struct {
+	ItemID uint   `json:"item_id,omitempty"`
+	Name   string `json:"name,omitempty"`
 }
 
 func GetProjectHandler(repository repository.ProjectRepository) httprouter.Handle {
@@ -27,7 +39,25 @@ func GetProjectHandler(repository repository.ProjectRepository) httprouter.Handl
 		}
 
 		log.Printf("Success getting project: %v", project)
-		responseBody := GetProjectResponseBody{Success: true, Project: project}
+		responseBody := buildGetProjectResponseBody(project)
 		utils.ReturnSuccessResponse(w, responseBody)
 	}
+}
+
+func buildGetProjectResponseBody(project *models.Project) GetProjectResponseBody {
+	itemResponses := make([]ItemResponse, len(project.Items))
+	for i, v := range project.Items {
+		itemResponses[i] = ItemResponse{
+			ItemID: v.ID,
+			Name:   v.Name,
+		}
+	}
+
+	responseBody := GetProjectResponseBody{Success: true, Project: ProjectResponse{
+		ProjectID:   project.ID,
+		Name:        project.Name,
+		Description: project.Description,
+		Items:       itemResponses,
+	}}
+	return responseBody
 }
