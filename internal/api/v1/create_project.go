@@ -2,6 +2,8 @@ package v1
 
 import (
 	"encoding/json"
+	"errors"
+	"github.com/fajrikornel/go-todoapp/internal/api/utils"
 	"github.com/fajrikornel/go-todoapp/internal/db"
 	"github.com/fajrikornel/go-todoapp/internal/models"
 	"github.com/julienschmidt/httprouter"
@@ -24,18 +26,14 @@ func CreateProjectHandler(store *db.SqlStore) httprouter.Handle {
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			log.Printf("Bad request: %v", err.Error())
 			responseBody := CreateProjectResponseBody{Success: false}
-			w.WriteHeader(400)
-			json.NewEncoder(w).Encode(responseBody)
+			utils.ReturnErrorResponse(w, 400, responseBody, err)
 			return
 		}
 
 		if requestBody.Name == "" || requestBody.Description == "" {
-			log.Printf("Bad request: empty name or description")
 			responseBody := CreateProjectResponseBody{Success: false}
-			w.WriteHeader(400)
-			json.NewEncoder(w).Encode(responseBody)
+			utils.ReturnErrorResponse(w, 400, responseBody, errors.New("invalid_format"))
 			return
 		}
 
@@ -46,17 +44,13 @@ func CreateProjectHandler(store *db.SqlStore) httprouter.Handle {
 
 		err = store.Create(&project)
 		if err != nil {
-			log.Printf("Error saving to DB: %v", err.Error())
 			responseBody := CreateProjectResponseBody{Success: false}
-			w.WriteHeader(500)
-			json.NewEncoder(w).Encode(responseBody)
+			utils.ReturnErrorResponse(w, 500, responseBody, err)
 			return
 		}
 
 		log.Printf("Success creating project: %v", project)
 		responseBody := CreateProjectResponseBody{Success: true}
-		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(responseBody)
+		utils.ReturnSuccessResponse(w, responseBody)
 	}
 }
