@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/fajrikornel/go-todoapp/internal/config"
 	"github.com/fajrikornel/go-todoapp/internal/db"
+	"github.com/fajrikornel/go-todoapp/internal/repository"
 	"github.com/fajrikornel/go-todoapp/internal/server"
 	"log"
 	"net/http"
@@ -22,7 +23,8 @@ func main() {
 		return
 	}
 
-	router := server.GetRouter(&store)
+	projectRepository := repository.NewProjectRepository(store)
+	router := server.GetRouter(projectRepository)
 
 	addr := fmt.Sprintf(":%d", conf.AppPort)
 

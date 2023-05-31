@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/fajrikornel/go-todoapp/internal/api/utils"
-	"github.com/fajrikornel/go-todoapp/internal/db"
 	"github.com/fajrikornel/go-todoapp/internal/models"
+	"github.com/fajrikornel/go-todoapp/internal/repository"
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
@@ -20,7 +20,7 @@ type CreateProjectResponseBody struct {
 	Success bool `json:"success"`
 }
 
-func CreateProjectHandler(store *db.SqlStore) httprouter.Handle {
+func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		var requestBody CreateProjectRequestBody
 
@@ -42,7 +42,7 @@ func CreateProjectHandler(store *db.SqlStore) httprouter.Handle {
 			Description: requestBody.Description,
 		}
 
-		err = store.Create(&project)
+		err = repository.Create(&project)
 		if err != nil {
 			responseBody := CreateProjectResponseBody{Success: false}
 			utils.ReturnErrorResponse(w, 500, responseBody, err)

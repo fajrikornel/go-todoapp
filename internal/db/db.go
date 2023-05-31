@@ -9,10 +9,10 @@ import (
 )
 
 type SqlStore struct {
-	db *gorm.DB
+	Db *gorm.DB
 }
 
-func GetSqlStore(conf *config.Config) (SqlStore, error) {
+func GetSqlStore(conf *config.Config) (*SqlStore, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d",
 		conf.DbHost,
 		conf.DbUsername,
@@ -22,21 +22,12 @@ func GetSqlStore(conf *config.Config) (SqlStore, error) {
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return SqlStore{}, err
+		return &SqlStore{}, err
 	}
 
-	return SqlStore{db: db}, nil
+	return &SqlStore{Db: db}, nil
 }
 
 func (s *SqlStore) DoMigrations() error {
-	return s.db.AutoMigrate(&models.Project{}, &models.Item{})
-}
-
-func (s *SqlStore) Create(model interface{}) error {
-	tx := s.db.Create(model)
-	if tx.Error != nil {
-		return tx.Error
-	}
-
-	return nil
+	return s.Db.AutoMigrate(&models.Project{}, &models.Item{})
 }
