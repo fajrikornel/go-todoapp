@@ -19,6 +19,7 @@ type CreateItemRequestBody struct {
 
 type CreateItemResponseBody struct {
 	Success bool `json:"success"`
+	ItemID  uint `json:"item_id"`
 }
 
 func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
@@ -53,7 +54,7 @@ func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		}
 
 		log.Printf("Success creating item: %v", item)
-		responseBody := CreateItemResponseBody{Success: true}
+		responseBody := CreateItemResponseBody{Success: true, ItemID: item.ID}
 		utils.ReturnSuccessResponse(w, responseBody)
 	}
 }

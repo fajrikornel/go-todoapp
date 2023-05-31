@@ -17,7 +17,8 @@ type CreateProjectRequestBody struct {
 }
 
 type CreateProjectResponseBody struct {
-	Success bool `json:"success"`
+	Success   bool `json:"success"`
+	ProjectID uint `json:"project_id"`
 }
 
 func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Handle {
@@ -50,7 +51,7 @@ func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 		}
 
 		log.Printf("Success creating project: %v", project)
-		responseBody := CreateProjectResponseBody{Success: true}
+		responseBody := CreateProjectResponseBody{Success: true, ProjectID: project.ID}
 		utils.ReturnSuccessResponse(w, responseBody)
 	}
 }
