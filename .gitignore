@@ -22,3 +22,5 @@ go.work
 
 .idea/
 .docker-data/
+config/application.yml
+build/
