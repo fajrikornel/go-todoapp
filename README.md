@@ -1,5 +1,6 @@
-# go-todoapp
-Go To-do App for practicing Go
+# To-Do App in Go
+
+Hopefully a CRUD app that takes vitamins.
 
 ### Initialize config:
 
@@ -26,3 +27,19 @@ build/migrate
 go build -o build/server cmd/server/server.go
 build/server
 ```
+
+### Author notes
+
+In this project, I'm trying to create a service that is developed in a healthy way. Some of the traits I'm trying to achieve:
+- Development ease: tools to help local development; migration commands, docker compose
+- Configurability: configure app via a YAML configuration
+- Well-documented: Swagger file, README instructions
+- Well-logged: logs can be correlated with related logs (via correlation ID)
+- Clean code: readability, separation of concerns, etc (though this is a bit more subjective/can always be improved)
+- Follows convention: in this case, following Go community convention (project layout, naming conventions, etc)
+
+Some of the things in my mind that are not yet implemented:
+- Tests
+- Configuration via environment variables
+- Instrumentation (metrics, dashboards, log search)
+- Deployment tools: Dockerfiles, CI/CD pipeline
