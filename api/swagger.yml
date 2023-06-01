@@ -123,6 +123,90 @@ paths:
                     success: false
                     data: {}
                     errors: "error string"
+    get:
+      summary: "Get details of a project"
+      description: "List a project's name, description, and items"
+      deprecated: false
+      tags:
+        - READ
+      parameters:
+        - name: Content-Type
+          in: header
+          required: true
+          description: ''
+          schema:
+            type: string
+          example: 'application/json'
+        - name: projectId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+          example: 1
+      responses:
+        200:
+          description: "Success getting the project"
+          content:
+            application/json:
+                schema:
+                  $ref: "#/components/schemas/GetProjectResponse"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              examples:
+                "Could not find project":
+                  value:
+                    success: false
+                    data: {}
+                    errors: "error string"
+  /v1/projects/{projectId}/{itemId}:
+    get:
+      summary: "Get details of an item"
+      description: "List an item's name and description"
+      deprecated: false
+      tags:
+        - READ
+      parameters:
+        - name: Content-Type
+          in: header
+          required: true
+          description: ''
+          schema:
+            type: string
+          example: 'application/json'
+        - name: projectId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+          example: 1
+        - name: itemId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+          example: 1
+      responses:
+        200:
+          description: "Success getting the item"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetItemResponse"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              examples:
+                "Could not find matching project ID and item ID":
+                  value:
+                    success: false
+                    data: {}
+                    errors: "error string"
 
 components:
   schemas:
@@ -150,3 +234,65 @@ components:
       required:
         - name
         - description
+    GetProjectResponse:
+      type: "object"
+      properties:
+        success:
+          type: "string"
+          description: "Response status"
+          example: true/false
+        data:
+          type: "object"
+          description: "Get project response data"
+          properties:
+            project_id:
+              type: "integer"
+              description: "Project ID"
+              example: 1
+            name:
+              type: "string"
+              description: "Non-empty project name"
+            description:
+              type: "string"
+              description: "Non-empty project description"
+            items:
+              type: "array"
+              description: "Items belonging to the project"
+              items:
+                type: "object"
+                description: "Item"
+                properties:
+                  item_id:
+                    type: "integer"
+                    description: "Item ID"
+                    example: 1
+                  name:
+                    type: "string"
+                    description: "Item name"
+        error:
+          type: "string"
+          description: "Error description"
+    GetItemResponse:
+      type: "object"
+      properties:
+        success:
+          type: "string"
+          description: "Response status"
+          example: true/false
+        data:
+          type: "object"
+          description: "Get item response data"
+          properties:
+            item_id:
+              type: "integer"
+              description: "Item ID"
+              example: 1
+            name:
+              type: "string"
+              description: "Non-empty item name"
+            description:
+              type: "string"
+              description: "Non-empty item description"
+        error:
+          type: "string"
+          description: "Error description"
