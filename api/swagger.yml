@@ -6,7 +6,7 @@ info:
   contact:
     email: "fajri.apk@gmail.com"
 servers:
-  - url: "http://{host}:8080"
+  - url: "http://localhost:8080"
 
 paths:
   /v1/projects:
