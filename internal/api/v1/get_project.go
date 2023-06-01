@@ -2,7 +2,6 @@ package v1
 
 import (
 	"github.com/fajrikornel/go-todoapp/internal/api/utils"
-	"github.com/fajrikornel/go-todoapp/internal/logging"
 	"github.com/fajrikornel/go-todoapp/internal/models"
 	"github.com/fajrikornel/go-todoapp/internal/repository"
 	"github.com/julienschmidt/httprouter"
@@ -38,7 +37,6 @@ func GetProjectHandler(repository repository.ProjectRepository) httprouter.Handl
 			return
 		}
 
-		logging.Infof(r.Context(), "Success getting project: %v", project)
 		responseBody := buildGetProjectResponseBody(project)
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
 	}

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/fajrikornel/go-todoapp/internal/api/utils"
-	"github.com/fajrikornel/go-todoapp/internal/logging"
 	"github.com/fajrikornel/go-todoapp/internal/models"
 	"github.com/fajrikornel/go-todoapp/internal/repository"
 	"github.com/julienschmidt/httprouter"
@@ -53,7 +52,6 @@ func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 			return
 		}
 
-		logging.Infof(r.Context(), "Success creating item: %v", item)
 		responseBody := CreateItemResponseBody{Success: true, ItemID: item.ID}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
 	}

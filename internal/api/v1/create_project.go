@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/fajrikornel/go-todoapp/internal/api/utils"
-	"github.com/fajrikornel/go-todoapp/internal/logging"
 	"github.com/fajrikornel/go-todoapp/internal/models"
 	"github.com/fajrikornel/go-todoapp/internal/repository"
 	"github.com/julienschmidt/httprouter"
@@ -50,7 +49,6 @@ func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 			return
 		}
 
-		logging.Infof(r.Context(), "Success creating project: %v", project)
 		responseBody := CreateProjectResponseBody{Success: true, ProjectID: project.ID}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
 	}
