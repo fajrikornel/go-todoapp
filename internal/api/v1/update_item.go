@@ -47,12 +47,18 @@ func UpdateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		}
 
 		fields := make(map[string]interface{})
-		if requestBody.Name != nil {
+		if requestBody.Name != nil && *requestBody.Name != "" {
 			fields["name"] = requestBody.Name
 		}
 
-		if requestBody.Description != nil {
+		if requestBody.Description != nil && *requestBody.Description != "" {
 			fields["description"] = requestBody.Description
+		}
+
+		if len(fields) == 0 {
+			responseBody := UpdateItemResponseBody{Success: false}
+			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_and_description_empty"))
+			return
 		}
 
 		err = repository.Update(projectId, itemId, fields)
