@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/fajrikornel/go-todoapp/internal/api/utils"
+	"github.com/fajrikornel/go-todoapp/internal/logging"
 	"github.com/fajrikornel/go-todoapp/internal/models"
 	"github.com/fajrikornel/go-todoapp/internal/repository"
 	"github.com/julienschmidt/httprouter"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -29,13 +29,13 @@ func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
 			responseBody := CreateItemResponseBody{Success: false}
-			utils.ReturnErrorResponse(w, 400, responseBody, err)
+			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
 
 		if requestBody.Name == nil || requestBody.Description == nil {
 			responseBody := CreateItemResponseBody{Success: false}
-			utils.ReturnErrorResponse(w, 400, responseBody, errors.New("invalid_format"))
+			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("invalid_format"))
 			return
 		}
 
@@ -49,12 +49,12 @@ func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		err = repository.Create(&item)
 		if err != nil {
 			responseBody := CreateItemResponseBody{Success: false}
-			utils.ReturnErrorResponse(w, 500, responseBody, err)
+			utils.ReturnErrorResponse(r.Context(), w, 500, responseBody, err)
 			return
 		}
 
-		log.Printf("Success creating item: %v", item)
+		logging.Infof(r.Context(), "Success creating item: %v", item)
 		responseBody := CreateItemResponseBody{Success: true, ItemID: item.ID}
-		utils.ReturnSuccessResponse(w, responseBody)
+		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
 	}
 }

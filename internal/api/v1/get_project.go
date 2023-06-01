@@ -2,10 +2,10 @@ package v1
 
 import (
 	"github.com/fajrikornel/go-todoapp/internal/api/utils"
+	"github.com/fajrikornel/go-todoapp/internal/logging"
 	"github.com/fajrikornel/go-todoapp/internal/models"
 	"github.com/fajrikornel/go-todoapp/internal/repository"
 	"github.com/julienschmidt/httprouter"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -34,13 +34,13 @@ func GetProjectHandler(repository repository.ProjectRepository) httprouter.Handl
 		project, err := repository.FindById(projectId)
 		if err != nil {
 			responseBody := GetProjectResponseBody{Success: false}
-			utils.ReturnErrorResponse(w, 400, responseBody, err)
+			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
 
-		log.Printf("Success getting project: %v", project)
+		logging.Infof(r.Context(), "Success getting project: %v", project)
 		responseBody := buildGetProjectResponseBody(project)
-		utils.ReturnSuccessResponse(w, responseBody)
+		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
 	}
 }
 

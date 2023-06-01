@@ -2,9 +2,9 @@ package v1
 
 import (
 	"github.com/fajrikornel/go-todoapp/internal/api/utils"
+	"github.com/fajrikornel/go-todoapp/internal/logging"
 	"github.com/fajrikornel/go-todoapp/internal/repository"
 	"github.com/julienschmidt/httprouter"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -29,16 +29,16 @@ func GetItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		item, err := repository.FindByProjectIdAndItemId(projectId, itemId)
 		if err != nil {
 			responseBody := GetItemResponseBody{Success: false}
-			utils.ReturnErrorResponse(w, 400, responseBody, err)
+			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
 
-		log.Printf("Success getting item: %v", item)
+		logging.Infof(r.Context(), "Success getting item: %v", item)
 		responseBody := GetItemResponseBody{Success: true, Item: DetailedItemResponse{
 			ItemID:      item.ID,
 			Name:        item.Name,
 			Description: item.Description,
 		}}
-		utils.ReturnSuccessResponse(w, responseBody)
+		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
 	}
 }

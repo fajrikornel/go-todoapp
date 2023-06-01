@@ -1,25 +1,26 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/fajrikornel/go-todoapp/internal/config"
 	"github.com/fajrikornel/go-todoapp/internal/db"
+	"github.com/fajrikornel/go-todoapp/internal/logging"
 	"github.com/fajrikornel/go-todoapp/internal/repository"
 	"github.com/fajrikornel/go-todoapp/internal/server"
-	"log"
 	"net/http"
 )
 
 func main() {
 	conf, err := config.GetConfig()
 	if err != nil {
-		log.Fatal("ERROR GETTING CONFIG: {}", err.Error())
+		logging.Errorf(context.Background(), "ERROR GETTING CONFIG: {}", err.Error())
 		return
 	}
 
 	store, err := db.GetSqlStore(conf)
 	if err != nil {
-		log.Fatal("ERROR INITIALIZING DB: {}", err.Error())
+		logging.Errorf(context.Background(), "ERROR INITIALIZING DB: {}", err.Error())
 		return
 	}
 
@@ -29,6 +30,6 @@ func main() {
 
 	addr := fmt.Sprintf(":%d", conf.AppPort)
 
-	log.Println("STARTING WEB SERVER")
-	log.Fatal(http.ListenAndServe(addr, router))
+	logging.Infof(context.Background(), "STARTING WEB SERVER")
+	logging.Errorf(context.Background(), "%s", http.ListenAndServe(addr, router).Error())
 }

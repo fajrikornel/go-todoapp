@@ -1,19 +1,20 @@
 package utils
 
 import (
+	"context"
 	"encoding/json"
-	"log"
+	"github.com/fajrikornel/go-todoapp/internal/logging"
 	"net/http"
 )
 
-func ReturnErrorResponse(w http.ResponseWriter, httpCode int, responseBody interface{}, err error) {
-	log.Printf("Returned error response: %v", err.Error())
+func ReturnErrorResponse(ctx context.Context, w http.ResponseWriter, httpCode int, responseBody interface{}, err error) {
+	logging.Errorf(ctx, "Returned error response: %v", err.Error())
 	w.WriteHeader(httpCode)
 	json.NewEncoder(w).Encode(responseBody)
 }
 
-func ReturnSuccessResponse(w http.ResponseWriter, responseBody interface{}) {
-	log.Printf("Returned success response: %+v", responseBody)
+func ReturnSuccessResponse(ctx context.Context, w http.ResponseWriter, responseBody interface{}) {
+	logging.Infof(ctx, "Returned success response: %v", responseBody)
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(responseBody)
 }

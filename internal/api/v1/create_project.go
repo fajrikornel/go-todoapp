@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/fajrikornel/go-todoapp/internal/api/utils"
+	"github.com/fajrikornel/go-todoapp/internal/logging"
 	"github.com/fajrikornel/go-todoapp/internal/models"
 	"github.com/fajrikornel/go-todoapp/internal/repository"
 	"github.com/julienschmidt/httprouter"
-	"log"
 	"net/http"
 )
 
@@ -28,13 +28,13 @@ func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
 			responseBody := CreateProjectResponseBody{Success: false}
-			utils.ReturnErrorResponse(w, 400, responseBody, err)
+			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
 
 		if requestBody.Name == nil || requestBody.Description == nil {
 			responseBody := CreateProjectResponseBody{Success: false}
-			utils.ReturnErrorResponse(w, 400, responseBody, errors.New("invalid_format"))
+			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("invalid_format"))
 			return
 		}
 
@@ -46,12 +46,12 @@ func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 		err = repository.Create(&project)
 		if err != nil {
 			responseBody := CreateProjectResponseBody{Success: false}
-			utils.ReturnErrorResponse(w, 500, responseBody, err)
+			utils.ReturnErrorResponse(r.Context(), w, 500, responseBody, err)
 			return
 		}
 
-		log.Printf("Success creating project: %v", project)
+		logging.Infof(r.Context(), "Success creating project: %v", project)
 		responseBody := CreateProjectResponseBody{Success: true, ProjectID: project.ID}
-		utils.ReturnSuccessResponse(w, responseBody)
+		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
 	}
 }
