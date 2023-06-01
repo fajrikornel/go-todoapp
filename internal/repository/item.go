@@ -9,6 +9,7 @@ type ItemRepository interface {
 	Create(item *models.Item) error
 	FindByProjectIdAndItemId(projectId, itemId int) (*models.Item, error)
 	Update(projectId int, itemId int, fields map[string]interface{}) error
+	Delete(projectId int, itemId int) error
 }
 
 type itemRepository struct {
@@ -42,6 +43,15 @@ func (i *itemRepository) FindByProjectIdAndItemId(projectId, itemId int) (*model
 
 func (i *itemRepository) Update(projectId int, itemId int, fields map[string]interface{}) error {
 	tx := i.sqlStore.Db.Model(&models.Item{ID: uint(itemId), ProjectID: uint(projectId)}).Updates(fields)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	return nil
+}
+
+func (i *itemRepository) Delete(projectId int, itemId int) error {
+	tx := i.sqlStore.Db.Delete(&models.Item{ID: uint(itemId), ProjectID: uint(projectId)})
 	if tx.Error != nil {
 		return tx.Error
 	}

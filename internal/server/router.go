@@ -20,6 +20,7 @@ func GetRouter(pRepository repository.ProjectRepository, iRepository repository.
 	router.PATCH("/v1/projects/:projectId", middleware.LoggingMiddleware(v1.UpdateProjectHandler(pRepository)))
 	router.PATCH("/v1/projects/:projectId/:itemId", middleware.LoggingMiddleware(v1.UpdateItemHandler(iRepository)))
 	router.DELETE("/v1/projects/:projectId", middleware.LoggingMiddleware(v1.DeleteProjectHandler(pRepository)))
+	router.DELETE("/v1/projects/:projectId/:itemId", middleware.LoggingMiddleware(v1.DeleteItemHandler(iRepository)))
 
 	return router
 }
