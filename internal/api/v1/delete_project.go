@@ -25,7 +25,7 @@ func DeleteProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 		err = repository.Delete(projectId)
 		if err != nil {
 			responseBody := utils.GenericResponse[DeleteProjectResponseData]{Success: false, Error: err.Error()}
-			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
+			utils.ReturnErrorResponse(r.Context(), w, 500, responseBody, err)
 			return
 		}
 

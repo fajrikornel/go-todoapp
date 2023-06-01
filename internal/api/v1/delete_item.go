@@ -26,7 +26,7 @@ func DeleteItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		err = repository.Delete(projectId, itemId)
 		if err != nil {
 			responseBody := utils.GenericResponse[DeleteItemResponseData]{Success: false, Error: err.Error()}
-			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
+			utils.ReturnErrorResponse(r.Context(), w, 500, responseBody, err)
 			return
 		}
 
