@@ -1,0 +1,152 @@
+openapi: "3.0.0"
+info:
+  version: "1.0.0"
+  title: "To-Do Application"
+  description: "API documentation for To-Do application"
+  contact:
+    email: "fajri.apk@gmail.com"
+servers:
+  - url: "http://{host}:8080"
+
+paths:
+  /v1/projects:
+    post:
+      summary: "Create a project"
+      description: "Create a project with a name and a description"
+      deprecated: false
+      tags:
+        - CREATE
+      parameters:
+        - name: Content-Type
+          in: header
+          required: true
+          description: ''
+          schema:
+            type: string
+          example: 'application/json'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProject"
+      responses:
+        200:
+          description: "Success creating project"
+          content:
+            application/json:
+              examples:
+                "Success":
+                  value:
+                    success: true
+                    data:
+                      project_id: "project_id"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              examples:
+                "Did not send name, description, or both":
+                  value:
+                    success: false
+                    data: {}
+                    errors: "name_or_description_empty"
+                "Sent empty name, empty description, or both":
+                  value:
+                    success: false
+                    data: {}
+                    errors: "name_or_description_empty"
+  /v1/projects/{projectId}:
+    post:
+      summary: "Create an item"
+      description: "Create an item with a name and a description"
+      deprecated: false
+      tags:
+        - CREATE
+      parameters:
+        - name: Content-Type
+          in: header
+          required: true
+          description: ''
+          schema:
+            type: string
+          example: 'application/json'
+        - name: projectId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+          example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateItem"
+      responses:
+        200:
+          description: "Success creating item"
+          content:
+            application/json:
+              examples:
+                "Success":
+                  value:
+                    success: true
+                    data:
+                      item_id: "item_id"
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              examples:
+                "Did not send name, description, or both":
+                  value:
+                    success: false
+                    data: {}
+                    errors: "name_or_description_empty"
+                "Sent empty name, empty description, or both":
+                  value:
+                    success: false
+                    data: {}
+                    errors: "name_or_description_empty"
+                "Invalid project ID":
+                  value:
+                    success: false
+                    data: {}
+                    errors: "error string"
+        500:
+          description: "Could not save item"
+          content:
+            application/json:
+              examples:
+                "Invalid project ID":
+                  value:
+                    success: false
+                    data: {}
+                    errors: "error string"
+
+components:
+  schemas:
+    CreateProject:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          description: "Non-empty project name"
+        description:
+          type: "string"
+          description: "Non-empty project description"
+      required:
+        - name
+        - description
+    CreateItem:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          description: "Non-empty item name"
+        description:
+          type: "string"
+          description: "Non-empty item description"
+      required:
+        - name
+        - description
