@@ -218,6 +218,54 @@ paths:
                   value:
                     success: false
                     errors: "error string"
+    delete:
+      summary: "Delete a project"
+      description: "Delete a project"
+      deprecated: false
+      tags:
+        - DELETE
+      parameters:
+        - name: Content-Type
+          in: header
+          required: true
+          description: ''
+          schema:
+            type: string
+          example: 'application/json'
+        - name: projectId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+          example: 1
+      responses:
+        200:
+          description: "Success deleting project"
+          content:
+            application/json:
+              examples:
+                "Success":
+                  value:
+                    success: true
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              examples:
+                "Project nonexistent":
+                  value:
+                    success: false
+                    errors: "error string"
+        500:
+          description: "Could not delete project"
+          content:
+            application/json:
+              examples:
+                "Could not delete project":
+                  value:
+                    success: false
+                    errors: "error string"
   /v1/projects/{projectId}/{itemId}:
     get:
       summary: "Get details of an item"
@@ -325,6 +373,61 @@ paths:
             application/json:
               examples:
                 "Could not update item":
+                  value:
+                    success: false
+                    errors: "error string"
+    delete:
+      summary: "Delete an item"
+      description: "Delete an item"
+      deprecated: false
+      tags:
+        - DELETE
+      parameters:
+        - name: Content-Type
+          in: header
+          required: true
+          description: ''
+          schema:
+            type: string
+          example: 'application/json'
+        - name: projectId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+          example: 1
+        - name: itemId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+          example: 1
+      responses:
+        200:
+          description: "Success deleting item"
+          content:
+            application/json:
+              examples:
+                "Success":
+                  value:
+                    success: true
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              examples:
+                "Item with corresponding item and project ID nonexistent":
+                  value:
+                    success: false
+                    errors: "error string"
+        500:
+          description: "Could not delete item"
+          content:
+            application/json:
+              examples:
+                "Could not delete project":
                   value:
                     success: false
                     errors: "error string"
