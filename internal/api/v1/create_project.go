@@ -33,7 +33,13 @@ func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 
 		if requestBody.Name == nil || requestBody.Description == nil {
 			responseBody := CreateProjectResponseBody{Success: false}
-			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("invalid_format"))
+			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_or_description_empty"))
+			return
+		}
+
+		if *requestBody.Name == "" || *requestBody.Description == "" {
+			responseBody := CreateProjectResponseBody{Success: false}
+			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_or_description_empty"))
 			return
 		}
 

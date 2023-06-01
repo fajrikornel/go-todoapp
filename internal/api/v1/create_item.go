@@ -34,7 +34,13 @@ func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 
 		if requestBody.Name == nil || requestBody.Description == nil {
 			responseBody := CreateItemResponseBody{Success: false}
-			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("invalid_format"))
+			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_or_description_empty"))
+			return
+		}
+
+		if *requestBody.Name == "" || *requestBody.Description == "" {
+			responseBody := CreateItemResponseBody{Success: false}
+			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_or_description_empty"))
 			return
 		}
 
