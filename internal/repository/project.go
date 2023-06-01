@@ -8,6 +8,7 @@ import (
 type ProjectRepository interface {
 	Create(project *models.Project) error
 	FindById(id int) (*models.Project, error)
+	Update(id int, fields map[string]interface{}) error
 }
 
 type projectRepository struct {
@@ -37,4 +38,13 @@ func (p *projectRepository) FindById(id int) (*models.Project, error) {
 	}
 
 	return project, nil
+}
+
+func (p *projectRepository) Update(id int, fields map[string]interface{}) error {
+	tx := p.sqlStore.Db.Model(&models.Project{ID: uint(id)}).Updates(fields)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	return nil
 }
