@@ -15,8 +15,7 @@ type CreateProjectRequestBody struct {
 	Description *string `json:"description"`
 }
 
-type CreateProjectResponseBody struct {
-	Success   bool `json:"success"`
+type CreateProjectResponseData struct {
 	ProjectID uint `json:"project_id,omitempty"`
 }
 
@@ -26,19 +25,19 @@ func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			responseBody := CreateProjectResponseBody{Success: false}
+			responseBody := utils.GenericResponse[CreateProjectResponseData]{Success: false, Error: err.Error()}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
 
 		if requestBody.Name == nil || requestBody.Description == nil {
-			responseBody := CreateProjectResponseBody{Success: false}
+			responseBody := utils.GenericResponse[CreateProjectResponseData]{Success: false, Error: "name_or_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_or_description_empty"))
 			return
 		}
 
 		if *requestBody.Name == "" || *requestBody.Description == "" {
-			responseBody := CreateProjectResponseBody{Success: false}
+			responseBody := utils.GenericResponse[CreateProjectResponseData]{Success: false, Error: "name_or_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_or_description_empty"))
 			return
 		}
@@ -50,12 +49,12 @@ func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 
 		err = repository.Create(&project)
 		if err != nil {
-			responseBody := CreateProjectResponseBody{Success: false}
+			responseBody := utils.GenericResponse[CreateProjectResponseData]{Success: false, Error: err.Error()}
 			utils.ReturnErrorResponse(r.Context(), w, 500, responseBody, err)
 			return
 		}
 
-		responseBody := CreateProjectResponseBody{Success: true, ProjectID: project.ID}
+		responseBody := utils.GenericResponse[CreateProjectResponseData]{Success: true, Data: CreateProjectResponseData{ProjectID: project.ID}}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
 	}
 }

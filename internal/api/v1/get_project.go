@@ -9,12 +9,7 @@ import (
 	"strconv"
 )
 
-type GetProjectResponseBody struct {
-	Success bool            `json:"success"`
-	Project ProjectResponse `json:"project,omitempty"`
-}
-
-type ProjectResponse struct {
+type GetProjectResponseData struct {
 	ProjectID   uint           `json:"project_id,omitempty"`
 	Name        string         `json:"name,omitempty"`
 	Description string         `json:"description,omitempty"`
@@ -32,7 +27,7 @@ func GetProjectHandler(repository repository.ProjectRepository) httprouter.Handl
 		projectId, _ := strconv.Atoi(p.ByName("projectId"))
 		project, err := repository.FindById(projectId)
 		if err != nil {
-			responseBody := GetProjectResponseBody{Success: false}
+			responseBody := utils.GenericResponse[GetProjectResponseData]{Success: false, Error: err.Error()}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
@@ -42,7 +37,7 @@ func GetProjectHandler(repository repository.ProjectRepository) httprouter.Handl
 	}
 }
 
-func buildGetProjectResponseBody(project *models.Project) GetProjectResponseBody {
+func buildGetProjectResponseBody(project *models.Project) utils.GenericResponse[GetProjectResponseData] {
 	itemResponses := make([]ItemResponse, len(project.Items))
 	for i, v := range project.Items {
 		itemResponses[i] = ItemResponse{
@@ -51,7 +46,7 @@ func buildGetProjectResponseBody(project *models.Project) GetProjectResponseBody
 		}
 	}
 
-	responseBody := GetProjectResponseBody{Success: true, Project: ProjectResponse{
+	responseBody := utils.GenericResponse[GetProjectResponseData]{Success: true, Data: GetProjectResponseData{
 		ProjectID:   project.ID,
 		Name:        project.Name,
 		Description: project.Description,

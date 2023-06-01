@@ -16,9 +16,8 @@ type CreateItemRequestBody struct {
 	Description *string `json:"description"`
 }
 
-type CreateItemResponseBody struct {
-	Success bool `json:"success"`
-	ItemID  uint `json:"item_id,omitempty"`
+type CreateItemResponseData struct {
+	ItemID uint `json:"item_id,omitempty"`
 }
 
 func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
@@ -27,19 +26,19 @@ func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			responseBody := CreateItemResponseBody{Success: false}
+			responseBody := utils.GenericResponse[CreateItemResponseData]{Success: false, Error: err.Error()}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
 
 		if requestBody.Name == nil || requestBody.Description == nil {
-			responseBody := CreateItemResponseBody{Success: false}
+			responseBody := utils.GenericResponse[CreateItemResponseData]{Success: false, Error: "name_or_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_or_description_empty"))
 			return
 		}
 
 		if *requestBody.Name == "" || *requestBody.Description == "" {
-			responseBody := CreateItemResponseBody{Success: false}
+			responseBody := utils.GenericResponse[CreateItemResponseData]{Success: false, Error: "name_or_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_or_description_empty"))
 			return
 		}
@@ -53,12 +52,12 @@ func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 
 		err = repository.Create(&item)
 		if err != nil {
-			responseBody := CreateItemResponseBody{Success: false}
+			responseBody := utils.GenericResponse[CreateItemResponseData]{Success: false, Error: err.Error()}
 			utils.ReturnErrorResponse(r.Context(), w, 500, responseBody, err)
 			return
 		}
 
-		responseBody := CreateItemResponseBody{Success: true, ItemID: item.ID}
+		responseBody := utils.GenericResponse[CreateItemResponseData]{Success: true, Data: CreateItemResponseData{ItemID: item.ID}}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
 	}
 }

@@ -15,9 +15,7 @@ type UpdateProjectRequestBody struct {
 	Description *string `json:"description"`
 }
 
-type UpdateProjectResponseBody struct {
-	Success bool `json:"success"`
-}
+type UpdateProjectResponseData struct{}
 
 func UpdateProjectHandler(repository repository.ProjectRepository) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -25,7 +23,7 @@ func UpdateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			responseBody := UpdateProjectResponseBody{Success: false}
+			responseBody := utils.GenericResponse[UpdateProjectResponseData]{Success: false, Error: err.Error()}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
@@ -33,7 +31,7 @@ func UpdateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 		projectId, _ := strconv.Atoi(p.ByName("projectId"))
 
 		if requestBody.Name == nil && requestBody.Description == nil {
-			responseBody := UpdateProjectResponseBody{Success: false}
+			responseBody := utils.GenericResponse[UpdateProjectResponseData]{Success: false, Error: "name_and_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_and_description_empty"))
 			return
 		}
@@ -48,19 +46,19 @@ func UpdateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 		}
 
 		if len(fields) == 0 {
-			responseBody := UpdateProjectResponseBody{Success: false}
+			responseBody := utils.GenericResponse[UpdateProjectResponseData]{Success: false, Error: "name_and_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_and_description_empty"))
 			return
 		}
 
 		err = repository.Update(projectId, fields)
 		if err != nil {
-			responseBody := UpdateProjectResponseBody{Success: false}
+			responseBody := utils.GenericResponse[UpdateProjectResponseData]{Success: false, Error: err.Error()}
 			utils.ReturnErrorResponse(r.Context(), w, 500, responseBody, err)
 			return
 		}
 
-		responseBody := UpdateProjectResponseBody{Success: true}
+		responseBody := utils.GenericResponse[UpdateProjectResponseData]{Success: true}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
 	}
 }

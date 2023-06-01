@@ -8,12 +8,7 @@ import (
 	"strconv"
 )
 
-type GetItemResponseBody struct {
-	Success bool                 `json:"success"`
-	Item    DetailedItemResponse `json:"item"`
-}
-
-type DetailedItemResponse struct {
+type GetItemResponseData struct {
 	ItemID      uint   `json:"item_id,omitempty"`
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
@@ -27,12 +22,12 @@ func GetItemHandler(repository repository.ItemRepository) httprouter.Handle {
 
 		item, err := repository.FindByProjectIdAndItemId(projectId, itemId)
 		if err != nil {
-			responseBody := GetItemResponseBody{Success: false}
+			responseBody := utils.GenericResponse[GetItemResponseData]{Success: false}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
 
-		responseBody := GetItemResponseBody{Success: true, Item: DetailedItemResponse{
+		responseBody := utils.GenericResponse[GetItemResponseData]{Success: true, Data: GetItemResponseData{
 			ItemID:      item.ID,
 			Name:        item.Name,
 			Description: item.Description,

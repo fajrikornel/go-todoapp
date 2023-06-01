@@ -8,9 +8,7 @@ import (
 	"strconv"
 )
 
-type DeleteItemResponseBody struct {
-	Success bool `json:"success"`
-}
+type DeleteItemResponseData struct{}
 
 func DeleteItemHandler(repository repository.ItemRepository) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -20,19 +18,19 @@ func DeleteItemHandler(repository repository.ItemRepository) httprouter.Handle {
 
 		_, err := repository.FindByProjectIdAndItemId(projectId, itemId)
 		if err != nil {
-			responseBody := DeleteItemResponseBody{Success: false}
+			responseBody := utils.GenericResponse[DeleteItemResponseData]{Success: false, Error: err.Error()}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
 
 		err = repository.Delete(projectId, itemId)
 		if err != nil {
-			responseBody := DeleteItemResponseBody{Success: false}
+			responseBody := utils.GenericResponse[DeleteItemResponseData]{Success: false, Error: err.Error()}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
 
-		responseBody := DeleteItemResponseBody{Success: true}
+		responseBody := utils.GenericResponse[DeleteItemResponseData]{Success: true}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
 	}
 }

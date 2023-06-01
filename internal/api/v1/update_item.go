@@ -15,9 +15,7 @@ type UpdateItemRequestBody struct {
 	Description *string `json:"description"`
 }
 
-type UpdateItemResponseBody struct {
-	Success bool `json:"success"`
-}
+type UpdateItemResponseData struct{}
 
 func UpdateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -25,7 +23,7 @@ func UpdateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			responseBody := UpdateItemResponseBody{Success: false}
+			responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: false, Error: err.Error()}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
@@ -35,13 +33,13 @@ func UpdateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 
 		_, err = repository.FindByProjectIdAndItemId(projectId, itemId)
 		if err != nil {
-			responseBody := UpdateItemResponseBody{Success: false}
+			responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: false, Error: "no_matching_project_and_item"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("no_matching_project_and_item"))
 			return
 		}
 
 		if requestBody.Name == nil && requestBody.Description == nil {
-			responseBody := UpdateItemResponseBody{Success: false}
+			responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: false, Error: "name_and_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_and_description_empty"))
 			return
 		}
@@ -56,19 +54,19 @@ func UpdateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		}
 
 		if len(fields) == 0 {
-			responseBody := UpdateItemResponseBody{Success: false}
+			responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: false, Error: "name_and_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_and_description_empty"))
 			return
 		}
 
 		err = repository.Update(projectId, itemId, fields)
 		if err != nil {
-			responseBody := UpdateItemResponseBody{Success: false}
+			responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: false, Error: err.Error()}
 			utils.ReturnErrorResponse(r.Context(), w, 500, responseBody, err)
 			return
 		}
 
-		responseBody := UpdateItemResponseBody{Success: true}
+		responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: true}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
 	}
 }

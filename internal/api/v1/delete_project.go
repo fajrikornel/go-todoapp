@@ -8,9 +8,7 @@ import (
 	"strconv"
 )
 
-type DeleteProjectResponseBody struct {
-	Success bool `json:"success"`
-}
+type DeleteProjectResponseData struct{}
 
 func DeleteProjectHandler(repository repository.ProjectRepository) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -19,19 +17,19 @@ func DeleteProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 
 		_, err := repository.FindById(projectId)
 		if err != nil {
-			responseBody := DeleteProjectResponseBody{Success: false}
+			responseBody := utils.GenericResponse[DeleteProjectResponseData]{Success: false, Error: err.Error()}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
 
 		err = repository.Delete(projectId)
 		if err != nil {
-			responseBody := DeleteProjectResponseBody{Success: false}
+			responseBody := utils.GenericResponse[DeleteProjectResponseData]{Success: false, Error: err.Error()}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
 
-		responseBody := DeleteProjectResponseBody{Success: true}
+		responseBody := utils.GenericResponse[DeleteProjectResponseData]{Success: true}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
 	}
 }
