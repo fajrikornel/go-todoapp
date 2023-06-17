@@ -21,6 +21,12 @@ go build -o build/migrate cmd/migrate/migrate.go
 build/migrate
 ```
 
+### Run tests
+
+```
+go test -p 1 -v ./test/...
+```
+
 ### Start the server
 
 ```
@@ -39,7 +45,7 @@ In this project, I'm trying to create a service that is developed in a healthy w
 - Follows convention: in this case, following Go community convention (project layout, naming conventions, etc)
 
 Some of the things in my mind that are not yet implemented:
-- Tests
+- Tests (ongoing)
 - Configuration via environment variables
 - Instrumentation (metrics, dashboards, log search)
 - Deployment tools: Dockerfiles, CI/CD pipeline
