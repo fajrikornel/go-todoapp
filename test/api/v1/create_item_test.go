@@ -3,6 +3,7 @@ package v1
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/fajrikornel/go-todoapp/internal/api/utils"
 	. "github.com/fajrikornel/go-todoapp/internal/api/v1"
 	"github.com/fajrikornel/go-todoapp/internal/models"
@@ -15,48 +16,55 @@ import (
 	"testing"
 )
 
-func TestCreateProjectHandler_BadRequest(t *testing.T) {
+func TestCreateItemHandler_BadRequest(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mProjectRepository := mock_repository.NewMockProjectRepository(ctrl)
+	mItemRepository := mock_repository.NewMockItemRepository(ctrl)
 
-	handleFunc := CreateProjectHandler(mProjectRepository)
+	handleFunc := CreateItemHandler(mItemRepository)
 
 	router := httprouter.New()
-	router.POST("/v1/projects", handleFunc)
+	router.POST("/v1/projects/:projectId", handleFunc)
 
 	testCases := []struct {
 		name        *string
 		description *string
+		projectId   int
 		error       string
 	}{
 		{
 			nil,
 			nil,
+			123,
 			"name_or_description_empty",
 		},
 		{
 			test_utils.CreatePointerOfString("name"),
 			nil,
+			123,
 			"name_or_description_empty",
 		},
 		{
 			nil,
 			test_utils.CreatePointerOfString("description"),
+			123,
 			"name_or_description_empty",
 		},
 		{
 			test_utils.CreatePointerOfString(""),
 			test_utils.CreatePointerOfString(""),
+			123,
 			"name_or_description_empty",
 		},
 		{
 			test_utils.CreatePointerOfString("name"),
 			test_utils.CreatePointerOfString(""),
+			123,
 			"name_or_description_empty",
 		},
 		{
 			test_utils.CreatePointerOfString(""),
 			test_utils.CreatePointerOfString("description"),
+			123,
 			"name_or_description_empty",
 		},
 	}
@@ -67,12 +75,12 @@ func TestCreateProjectHandler_BadRequest(t *testing.T) {
 				Description: tc.description,
 			}
 
-			mProjectRepository.
+			mItemRepository.
 				EXPECT().
 				Create(gomock.Any()).
 				Times(0)
 
-			req := httptest.NewRequest("POST", "/v1/projects", test_utils.ConvertStructToIoReader(requestBody))
+			req := httptest.NewRequest("POST", fmt.Sprintf("/v1/projects/%d", tc.projectId), test_utils.ConvertStructToIoReader(requestBody))
 			rr := httptest.NewRecorder()
 
 			router.ServeHTTP(rr, req)
@@ -81,10 +89,10 @@ func TestCreateProjectHandler_BadRequest(t *testing.T) {
 				t.Errorf("Unexpected HTTP return code. Expected: %d, actual: %d", 400, rr.Code)
 			}
 
-			var actualResponse utils.GenericResponse[CreateProjectResponseData]
+			var actualResponse utils.GenericResponse[CreateItemResponseData]
 			json.Unmarshal(rr.Body.Bytes(), &actualResponse)
 
-			expectedResponse := utils.GenericResponse[CreateProjectResponseData]{
+			expectedResponse := utils.GenericResponse[CreateItemResponseData]{
 				Success: false,
 				Error:   tc.error,
 			}
@@ -96,22 +104,24 @@ func TestCreateProjectHandler_BadRequest(t *testing.T) {
 	}
 }
 
-func TestCreateProjectHandler_InternalServerError(t *testing.T) {
+func TestCreateItemHandler_InternalServerError(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mProjectRepository := mock_repository.NewMockProjectRepository(ctrl)
+	mItemRepository := mock_repository.NewMockItemRepository(ctrl)
 
-	handleFunc := CreateProjectHandler(mProjectRepository)
+	handleFunc := CreateItemHandler(mItemRepository)
 
 	router := httprouter.New()
-	router.POST("/v1/projects", handleFunc)
+	router.POST("/v1/projects/:projectId", handleFunc)
 
 	testCases := []struct {
 		name        *string
 		description *string
+		projectId   int
 	}{
 		{
 			test_utils.CreatePointerOfString("name"),
 			test_utils.CreatePointerOfString("description"),
+			123,
 		},
 	}
 	for _, tc := range testCases {
@@ -121,15 +131,16 @@ func TestCreateProjectHandler_InternalServerError(t *testing.T) {
 				Description: tc.description,
 			}
 
-			mProjectRepository.
+			mItemRepository.
 				EXPECT().
-				Create(gomock.Eq(&models.Project{
+				Create(gomock.Eq(&models.Item{
 					Name:        *tc.name,
 					Description: *tc.description,
+					ProjectID:   uint(tc.projectId),
 				})).
 				Return(errors.New("error_string"))
 
-			req := httptest.NewRequest("POST", "/v1/projects", test_utils.ConvertStructToIoReader(requestBody))
+			req := httptest.NewRequest("POST", fmt.Sprintf("/v1/projects/%d", tc.projectId), test_utils.ConvertStructToIoReader(requestBody))
 			rr := httptest.NewRecorder()
 
 			router.ServeHTTP(rr, req)
@@ -138,10 +149,10 @@ func TestCreateProjectHandler_InternalServerError(t *testing.T) {
 				t.Errorf("Unexpected HTTP return code. Expected: %d, actual: %d", 500, rr.Code)
 			}
 
-			var actualResponse utils.GenericResponse[CreateProjectResponseData]
+			var actualResponse utils.GenericResponse[CreateItemResponseData]
 			json.Unmarshal(rr.Body.Bytes(), &actualResponse)
 
-			expectedResponse := utils.GenericResponse[CreateProjectResponseData]{
+			expectedResponse := utils.GenericResponse[CreateItemResponseData]{
 				Success: false,
 				Error:   "error_string",
 			}
@@ -152,22 +163,24 @@ func TestCreateProjectHandler_InternalServerError(t *testing.T) {
 	}
 }
 
-func TestCreateProjectHandler_Success(t *testing.T) {
+func TestCreateItemHandler_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mProjectRepository := mock_repository.NewMockProjectRepository(ctrl)
+	mItemRepository := mock_repository.NewMockItemRepository(ctrl)
 
-	handleFunc := CreateProjectHandler(mProjectRepository)
+	handleFunc := CreateItemHandler(mItemRepository)
 
 	router := httprouter.New()
-	router.POST("/v1/projects", handleFunc)
+	router.POST("/v1/projects/:projectId", handleFunc)
 
 	testCases := []struct {
 		name        *string
 		description *string
+		projectId   int
 	}{
 		{
 			test_utils.CreatePointerOfString("name"),
 			test_utils.CreatePointerOfString("description"),
+			123,
 		},
 	}
 	for _, tc := range testCases {
@@ -177,17 +190,18 @@ func TestCreateProjectHandler_Success(t *testing.T) {
 				Description: tc.description,
 			}
 
-			mProjectRepository.
+			mItemRepository.
 				EXPECT().
-				Create(gomock.Eq(&models.Project{
+				Create(gomock.Eq(&models.Item{
 					Name:        *tc.name,
 					Description: *tc.description,
+					ProjectID:   uint(tc.projectId),
 				})).
-				Do(func(m *models.Project) {
-					m.ID = 123
+				Do(func(m *models.Item) {
+					m.ID = 345
 				})
 
-			req := httptest.NewRequest("POST", "/v1/projects", test_utils.ConvertStructToIoReader(requestBody))
+			req := httptest.NewRequest("POST", fmt.Sprintf("/v1/projects/%d", tc.projectId), test_utils.ConvertStructToIoReader(requestBody))
 			rr := httptest.NewRecorder()
 
 			router.ServeHTTP(rr, req)
@@ -196,12 +210,12 @@ func TestCreateProjectHandler_Success(t *testing.T) {
 				t.Errorf("Unexpected HTTP return code. Expected: %d, actual: %d", 200, rr.Code)
 			}
 
-			var actualResponse utils.GenericResponse[CreateProjectResponseData]
+			var actualResponse utils.GenericResponse[CreateItemResponseData]
 			json.Unmarshal(rr.Body.Bytes(), &actualResponse)
 
-			expectedResponse := utils.GenericResponse[CreateProjectResponseData]{
+			expectedResponse := utils.GenericResponse[CreateItemResponseData]{
 				Success: true,
-				Data:    CreateProjectResponseData{ProjectID: 123},
+				Data:    CreateItemResponseData{ItemID: 345},
 			}
 			if !reflect.DeepEqual(expectedResponse, actualResponse) {
 				t.Errorf("Unexpected HTTP return code. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
