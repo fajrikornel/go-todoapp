@@ -12,7 +12,7 @@ type SqlStore struct {
 	Db *gorm.DB
 }
 
-func GetSqlStore(conf *config.Config) (*SqlStore, error) {
+func GetSqlStore(conf *config.DbConfig) (*SqlStore, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d",
 		conf.DbHost,
 		conf.DbUsername,

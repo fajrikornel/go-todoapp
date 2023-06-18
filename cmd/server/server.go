@@ -12,13 +12,8 @@ import (
 )
 
 func main() {
-	conf, err := config.GetConfig()
-	if err != nil {
-		logging.Errorf(context.Background(), "ERROR GETTING CONFIG: {}", err.Error())
-		return
-	}
-
-	store, err := db.GetSqlStore(conf)
+	dbConfig := config.GetDbConfig()
+	store, err := db.GetSqlStore(&dbConfig)
 	if err != nil {
 		logging.Errorf(context.Background(), "ERROR INITIALIZING DB: {}", err.Error())
 		return
@@ -28,7 +23,7 @@ func main() {
 	itemRepository := repository.NewItemRepository(store)
 	router := server.GetRouter(projectRepository, itemRepository)
 
-	addr := fmt.Sprintf(":%d", conf.AppPort)
+	addr := fmt.Sprintf(":%d", config.GetAppPort())
 
 	logging.Infof(context.Background(), "STARTING WEB SERVER")
 	logging.Errorf(context.Background(), "%s", http.ListenAndServe(addr, router).Error())

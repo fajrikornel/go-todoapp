@@ -8,13 +8,8 @@ import (
 )
 
 func main() {
-	conf, err := config.GetConfig()
-	if err != nil {
-		logging.Errorf(context.Background(), "ERROR GETTING CONFIG: %v\n", err.Error())
-		return
-	}
-
-	sqlStore, err := db.GetSqlStore(conf)
+	dbConfig := config.GetDbConfig()
+	sqlStore, err := db.GetSqlStore(&dbConfig)
 	if err != nil {
 		logging.Errorf(context.Background(), "ERROR INITIALIZING DB: %v\n", err.Error())
 		return
