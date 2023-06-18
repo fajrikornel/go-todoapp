@@ -1,9 +1,11 @@
 package v1
 
 import (
+	"errors"
 	"github.com/fajrikornel/go-todoapp/internal/api/utils"
 	"github.com/fajrikornel/go-todoapp/internal/repository"
 	"github.com/julienschmidt/httprouter"
+	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
@@ -23,7 +25,13 @@ func GetItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		item, err := repository.FindByProjectIdAndItemId(projectId, itemId)
 		if err != nil {
 			responseBody := utils.GenericResponse[GetItemResponseData]{Success: false}
-			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
+
+			httpCode := 500
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				httpCode = 400
+			}
+
+			utils.ReturnErrorResponse(r.Context(), w, httpCode, responseBody, err)
 			return
 		}
 
