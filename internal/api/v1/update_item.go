@@ -32,13 +32,6 @@ func UpdateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		projectId, _ := strconv.Atoi(p.ByName("projectId"))
 		itemId, _ := strconv.Atoi(p.ByName("itemId"))
 
-		_, err = repository.FindByProjectIdAndItemId(projectId, itemId)
-		if err != nil {
-			responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: false, Error: "no_matching_project_and_item"}
-			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("no_matching_project_and_item"))
-			return
-		}
-
 		if requestBody.Name == nil && requestBody.Description == nil {
 			responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: false, Error: "name_and_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_and_description_empty"))
