@@ -50,9 +50,9 @@ In this project, I'm trying to create a service that is developed in a healthy w
 - Well-logged: logs can be correlated with related logs (via correlation ID)
 - Clean code: readability, separation of concerns, etc (though this is a bit more subjective/can always be improved)
 - Follows convention: in this case, following Go community convention (project layout, naming conventions, etc)
+- Equipped with good unit tests with good testing structure/framework
 
 Some of the things in my mind that are not yet implemented:
-- Tests (ongoing)
 - Configuration via environment variables
 - Instrumentation (metrics, dashboards, log search)
 - Deployment tools: Dockerfiles, CI/CD pipeline
