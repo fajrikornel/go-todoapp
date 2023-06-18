@@ -24,7 +24,7 @@ func UpdateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: false, Error: err.Error()}
+			responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: false, Error: "invalid_request_format"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
@@ -55,10 +55,11 @@ func UpdateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 
 		err = repository.Update(projectId, itemId, fields)
 		if err != nil {
-			responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: false, Error: err.Error()}
+			responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: false, Error: "internal_db_error"}
 
 			httpCode := 500
 			if errors.Is(err, gorm.ErrRecordNotFound) {
+				responseBody.Error = "item_or_project_not_found"
 				httpCode = 400
 			}
 

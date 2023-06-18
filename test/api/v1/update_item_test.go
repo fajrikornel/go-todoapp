@@ -25,13 +25,14 @@ func TestUpdateItemHandler_Error(t *testing.T) {
 	router.PATCH("/v1/projects/:projectId/:itemId", handleFunc)
 
 	testCases := []struct {
-		testName         string
-		projectId        int
-		itemId           int
-		name             *string
-		description      *string
-		returnedError    error
-		expectedHttpCode int
+		testName             string
+		projectId            int
+		itemId               int
+		name                 *string
+		description          *string
+		returnedError        error
+		expectedErrorMessage string
+		expectedHttpCode     int
 	}{
 		{
 			"project does not exist in database",
@@ -40,6 +41,7 @@ func TestUpdateItemHandler_Error(t *testing.T) {
 			testutils.CreatePointerOfString("name"),
 			testutils.CreatePointerOfString("description"),
 			gorm.ErrRecordNotFound,
+			"item_or_project_not_found",
 			400,
 		},
 		{
@@ -49,6 +51,7 @@ func TestUpdateItemHandler_Error(t *testing.T) {
 			testutils.CreatePointerOfString("name"),
 			testutils.CreatePointerOfString("description"),
 			gorm.ErrUnsupportedDriver,
+			"internal_db_error",
 			500,
 		},
 	}
@@ -79,7 +82,7 @@ func TestUpdateItemHandler_Error(t *testing.T) {
 
 			expectedResponse := utils.GenericResponse[UpdateItemResponseData]{
 				Success: false,
-				Error:   tc.returnedError.Error(),
+				Error:   tc.expectedErrorMessage,
 			}
 			if !reflect.DeepEqual(expectedResponse, actualResponse) {
 				t.Errorf("Unexpected HTTP response. Expected: %+v, actual: %+v", expectedResponse, actualResponse)

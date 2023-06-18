@@ -26,7 +26,7 @@ func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			responseBody := utils.GenericResponse[CreateItemResponseData]{Success: false, Error: err.Error()}
+			responseBody := utils.GenericResponse[CreateItemResponseData]{Success: false, Error: "invalid_request_format"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
@@ -52,7 +52,7 @@ func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 
 		err = repository.Create(&item)
 		if err != nil {
-			responseBody := utils.GenericResponse[CreateItemResponseData]{Success: false, Error: err.Error()}
+			responseBody := utils.GenericResponse[CreateItemResponseData]{Success: false, Error: "internal_db_error"}
 			utils.ReturnErrorResponse(r.Context(), w, 500, responseBody, err)
 			return
 		}

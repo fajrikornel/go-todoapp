@@ -24,17 +24,19 @@ func TestDeleteItemHandler_Error(t *testing.T) {
 	router.DELETE("/v1/projects/:projectId/:itemId", handleFunc)
 
 	testCases := []struct {
-		testName         string
-		projectId        int
-		itemId           int
-		returnedError    error
-		expectedHttpCode int
+		testName             string
+		projectId            int
+		itemId               int
+		returnedError        error
+		expectedErrorMessage string
+		expectedHttpCode     int
 	}{
 		{
 			"project does not exist in database",
 			123,
 			345,
 			gorm.ErrRecordNotFound,
+			"item_or_project_not_found",
 			400,
 		},
 		{
@@ -42,6 +44,7 @@ func TestDeleteItemHandler_Error(t *testing.T) {
 			123,
 			345,
 			gorm.ErrUnsupportedDriver,
+			"internal_db_error",
 			500,
 		},
 	}
@@ -67,7 +70,7 @@ func TestDeleteItemHandler_Error(t *testing.T) {
 
 			expectedResponse := utils.GenericResponse[DeleteItemResponseData]{
 				Success: false,
-				Error:   tc.returnedError.Error(),
+				Error:   tc.expectedErrorMessage,
 			}
 			if !reflect.DeepEqual(expectedResponse, actualResponse) {
 				t.Errorf("Unexpected HTTP response. Expected: %+v, actual: %+v", expectedResponse, actualResponse)

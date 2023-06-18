@@ -20,10 +20,11 @@ func DeleteItemHandler(repository repository.ItemRepository) httprouter.Handle {
 
 		err := repository.Delete(projectId, itemId)
 		if err != nil {
-			responseBody := utils.GenericResponse[DeleteItemResponseData]{Success: false, Error: err.Error()}
+			responseBody := utils.GenericResponse[DeleteItemResponseData]{Success: false, Error: "internal_db_error"}
 
 			httpCode := 500
 			if errors.Is(err, gorm.ErrRecordNotFound) {
+				responseBody.Error = "item_or_project_not_found"
 				httpCode = 400
 			}
 

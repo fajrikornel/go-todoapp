@@ -152,7 +152,7 @@ func TestCreateProjectHandler_InternalServerError(t *testing.T) {
 
 			expectedResponse := utils.GenericResponse[CreateProjectResponseData]{
 				Success: false,
-				Error:   "error_string",
+				Error:   "internal_db_error",
 			}
 			if !reflect.DeepEqual(expectedResponse, actualResponse) {
 				t.Errorf("Unexpected HTTP response. Expected: %+v, actual: %+v", expectedResponse, actualResponse)

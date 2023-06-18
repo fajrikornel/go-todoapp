@@ -24,7 +24,7 @@ func UpdateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			responseBody := utils.GenericResponse[UpdateProjectResponseData]{Success: false, Error: err.Error()}
+			responseBody := utils.GenericResponse[UpdateProjectResponseData]{Success: false, Error: "invalid_request_format"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
@@ -54,10 +54,11 @@ func UpdateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 
 		err = repository.Update(projectId, fields)
 		if err != nil {
-			responseBody := utils.GenericResponse[UpdateProjectResponseData]{Success: false, Error: err.Error()}
+			responseBody := utils.GenericResponse[UpdateProjectResponseData]{Success: false, Error: "internal_db_error"}
 
 			httpCode := 500
 			if errors.Is(err, gorm.ErrRecordNotFound) {
+				responseBody.Error = "project_not_found"
 				httpCode = 400
 			}
 

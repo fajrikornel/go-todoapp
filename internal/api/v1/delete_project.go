@@ -19,10 +19,11 @@ func DeleteProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 
 		err := repository.Delete(projectId)
 		if err != nil {
-			responseBody := utils.GenericResponse[DeleteProjectResponseData]{Success: false, Error: err.Error()}
+			responseBody := utils.GenericResponse[DeleteProjectResponseData]{Success: false, Error: "internal_db_error"}
 
 			httpCode := 500
 			if errors.Is(err, gorm.ErrRecordNotFound) {
+				responseBody.Error = "project_not_found"
 				httpCode = 400
 			}
 

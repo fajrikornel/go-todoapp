@@ -25,7 +25,7 @@ func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 
 		err := json.NewDecoder(r.Body).Decode(&requestBody)
 		if err != nil {
-			responseBody := utils.GenericResponse[CreateProjectResponseData]{Success: false, Error: err.Error()}
+			responseBody := utils.GenericResponse[CreateProjectResponseData]{Success: false, Error: "invalid_request_format"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
 			return
 		}
@@ -49,7 +49,7 @@ func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 
 		err = repository.Create(&project)
 		if err != nil {
-			responseBody := utils.GenericResponse[CreateProjectResponseData]{Success: false, Error: err.Error()}
+			responseBody := utils.GenericResponse[CreateProjectResponseData]{Success: false, Error: "internal_db_error"}
 			utils.ReturnErrorResponse(r.Context(), w, 500, responseBody, err)
 			return
 		}

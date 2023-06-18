@@ -29,10 +29,11 @@ func GetProjectHandler(repository repository.ProjectRepository) httprouter.Handl
 		projectId, _ := strconv.Atoi(p.ByName("projectId"))
 		project, err := repository.FindById(projectId)
 		if err != nil {
-			responseBody := utils.GenericResponse[GetProjectResponseData]{Success: false, Error: err.Error()}
+			responseBody := utils.GenericResponse[GetProjectResponseData]{Success: false, Error: "internal_db_error"}
 
 			httpCode := 500
 			if errors.Is(err, gorm.ErrRecordNotFound) {
+				responseBody.Error = "project_not_found"
 				httpCode = 400
 			}
 

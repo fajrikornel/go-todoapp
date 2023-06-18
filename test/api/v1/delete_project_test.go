@@ -24,21 +24,24 @@ func TestDeleteProjectHandler_Error(t *testing.T) {
 	router.DELETE("/v1/projects/:projectId", handleFunc)
 
 	testCases := []struct {
-		testName         string
-		projectId        int
-		returnedError    error
-		expectedHttpCode int
+		testName             string
+		projectId            int
+		returnedError        error
+		expectedErrorMessage string
+		expectedHttpCode     int
 	}{
 		{
 			"project does not exist in database",
 			123,
 			gorm.ErrRecordNotFound,
+			"project_not_found",
 			400,
 		},
 		{
 			"error while calling database",
 			123,
 			gorm.ErrUnsupportedDriver,
+			"internal_db_error",
 			500,
 		},
 	}
@@ -64,7 +67,7 @@ func TestDeleteProjectHandler_Error(t *testing.T) {
 
 			expectedResponse := utils.GenericResponse[DeleteProjectResponseData]{
 				Success: false,
-				Error:   tc.returnedError.Error(),
+				Error:   tc.expectedErrorMessage,
 			}
 			if !reflect.DeepEqual(expectedResponse, actualResponse) {
 				t.Errorf("Unexpected HTTP response. Expected: %+v, actual: %+v", expectedResponse, actualResponse)

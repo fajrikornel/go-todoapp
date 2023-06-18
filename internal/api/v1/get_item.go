@@ -24,10 +24,11 @@ func GetItemHandler(repository repository.ItemRepository) httprouter.Handle {
 
 		item, err := repository.FindByProjectIdAndItemId(projectId, itemId)
 		if err != nil {
-			responseBody := utils.GenericResponse[GetItemResponseData]{Success: false, Error: err.Error()}
+			responseBody := utils.GenericResponse[GetItemResponseData]{Success: false, Error: "internal_db_error"}
 
 			httpCode := 500
 			if errors.Is(err, gorm.ErrRecordNotFound) {
+				responseBody.Error = "item_or_project_not_found"
 				httpCode = 400
 			}
 
