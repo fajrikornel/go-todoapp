@@ -37,7 +37,7 @@ func TestDeleteItemHandler_Error(t *testing.T) {
 			345,
 			gorm.ErrRecordNotFound,
 			"item_or_project_not_found",
-			400,
+			404,
 		},
 		{
 			"error while calling database",

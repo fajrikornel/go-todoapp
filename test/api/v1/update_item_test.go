@@ -42,7 +42,7 @@ func TestUpdateItemHandler_Error(t *testing.T) {
 			testutils.CreatePointerOfString("description"),
 			gorm.ErrRecordNotFound,
 			"item_or_project_not_found",
-			400,
+			404,
 		},
 		{
 			"error while calling database",

@@ -24,7 +24,7 @@ func DeleteProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 			httpCode := 500
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				responseBody.Error = "project_not_found"
-				httpCode = 400
+				httpCode = 404
 			}
 
 			utils.ReturnErrorResponse(r.Context(), w, httpCode, responseBody, err)

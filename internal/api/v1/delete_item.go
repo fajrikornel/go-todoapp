@@ -25,7 +25,7 @@ func DeleteItemHandler(repository repository.ItemRepository) httprouter.Handle {
 			httpCode := 500
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				responseBody.Error = "item_or_project_not_found"
-				httpCode = 400
+				httpCode = 404
 			}
 
 			utils.ReturnErrorResponse(r.Context(), w, httpCode, responseBody, err)

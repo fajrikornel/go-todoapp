@@ -36,7 +36,7 @@ func TestGetProjectHandler_Error(t *testing.T) {
 			123,
 			gorm.ErrRecordNotFound,
 			"project_not_found",
-			400,
+			404,
 		},
 		{
 			"error while calling database",

@@ -34,7 +34,7 @@ func GetProjectHandler(repository repository.ProjectRepository) httprouter.Handl
 			httpCode := 500
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				responseBody.Error = "project_not_found"
-				httpCode = 400
+				httpCode = 404
 			}
 
 			utils.ReturnErrorResponse(r.Context(), w, httpCode, responseBody, err)
