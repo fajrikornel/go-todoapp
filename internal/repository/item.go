@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/fajrikornel/go-todoapp/internal/db"
 	"github.com/fajrikornel/go-todoapp/internal/models"
+	"gorm.io/gorm"
 )
 
 type ItemRepository interface {
@@ -43,11 +44,11 @@ func (i *itemRepository) FindByProjectIdAndItemId(projectId, itemId int) (*model
 
 func (i *itemRepository) Update(projectId int, itemId int, fields map[string]interface{}) error {
 	tx := i.sqlStore.Db.Model(&models.Item{ID: uint(itemId), ProjectID: uint(projectId)}).Updates(fields)
-	if tx.Error != nil {
-		return tx.Error
+	if tx.Error == nil && tx.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
 	}
 
-	return nil
+	return tx.Error
 }
 
 func (i *itemRepository) Delete(projectId int, itemId int) error {

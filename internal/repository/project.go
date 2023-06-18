@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/fajrikornel/go-todoapp/internal/db"
 	"github.com/fajrikornel/go-todoapp/internal/models"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -44,11 +45,11 @@ func (p *projectRepository) FindById(id int) (*models.Project, error) {
 
 func (p *projectRepository) Update(id int, fields map[string]interface{}) error {
 	tx := p.sqlStore.Db.Model(&models.Project{ID: uint(id)}).Updates(fields)
-	if tx.Error != nil {
-		return tx.Error
+	if tx.Error == nil && tx.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
 	}
 
-	return nil
+	return tx.Error
 }
 
 func (p *projectRepository) Delete(projectId int) error {
