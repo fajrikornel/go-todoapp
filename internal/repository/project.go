@@ -54,9 +54,9 @@ func (p *projectRepository) Update(id int, fields map[string]interface{}) error 
 
 func (p *projectRepository) Delete(projectId int) error {
 	tx := p.sqlStore.Db.Select(clause.Associations).Delete(&models.Project{ID: uint(projectId)})
-	if tx.Error != nil {
-		return tx.Error
+	if tx.Error == nil && tx.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
 	}
 
-	return nil
+	return tx.Error
 }

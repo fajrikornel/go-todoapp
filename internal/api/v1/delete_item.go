@@ -1,9 +1,11 @@
 package v1
 
 import (
+	"errors"
 	"github.com/fajrikornel/go-todoapp/internal/api/utils"
 	"github.com/fajrikornel/go-todoapp/internal/repository"
 	"github.com/julienschmidt/httprouter"
+	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
@@ -16,17 +18,16 @@ func DeleteItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		projectId, _ := strconv.Atoi(p.ByName("projectId"))
 		itemId, _ := strconv.Atoi(p.ByName("itemId"))
 
-		_, err := repository.FindByProjectIdAndItemId(projectId, itemId)
+		err := repository.Delete(projectId, itemId)
 		if err != nil {
 			responseBody := utils.GenericResponse[DeleteItemResponseData]{Success: false, Error: err.Error()}
-			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
-			return
-		}
 
-		err = repository.Delete(projectId, itemId)
-		if err != nil {
-			responseBody := utils.GenericResponse[DeleteItemResponseData]{Success: false, Error: err.Error()}
-			utils.ReturnErrorResponse(r.Context(), w, 500, responseBody, err)
+			httpCode := 500
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				httpCode = 400
+			}
+
+			utils.ReturnErrorResponse(r.Context(), w, httpCode, responseBody, err)
 			return
 		}
 

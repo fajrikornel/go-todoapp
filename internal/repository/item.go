@@ -53,9 +53,9 @@ func (i *itemRepository) Update(projectId int, itemId int, fields map[string]int
 
 func (i *itemRepository) Delete(projectId int, itemId int) error {
 	tx := i.sqlStore.Db.Delete(&models.Item{ID: uint(itemId), ProjectID: uint(projectId)})
-	if tx.Error != nil {
-		return tx.Error
+	if tx.Error == nil && tx.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
 	}
 
-	return nil
+	return tx.Error
 }
