@@ -6,7 +6,7 @@ import (
 	"github.com/fajrikornel/go-todoapp/internal/api/utils"
 	. "github.com/fajrikornel/go-todoapp/internal/api/v1"
 	mock_repository "github.com/fajrikornel/go-todoapp/test/mocks/repository"
-	"github.com/fajrikornel/go-todoapp/test/test_utils"
+	"github.com/fajrikornel/go-todoapp/test/testutils"
 	"github.com/golang/mock/gomock"
 	"github.com/julienschmidt/httprouter"
 	"gorm.io/gorm"
@@ -37,8 +37,8 @@ func TestUpdateItemHandler_Error(t *testing.T) {
 			"project does not exist in database",
 			123,
 			345,
-			test_utils.CreatePointerOfString("name"),
-			test_utils.CreatePointerOfString("description"),
+			testutils.CreatePointerOfString("name"),
+			testutils.CreatePointerOfString("description"),
 			gorm.ErrRecordNotFound,
 			400,
 		},
@@ -46,8 +46,8 @@ func TestUpdateItemHandler_Error(t *testing.T) {
 			"error while calling database",
 			123,
 			345,
-			test_utils.CreatePointerOfString("name"),
-			test_utils.CreatePointerOfString("description"),
+			testutils.CreatePointerOfString("name"),
+			testutils.CreatePointerOfString("description"),
 			gorm.ErrUnsupportedDriver,
 			500,
 		},
@@ -59,13 +59,13 @@ func TestUpdateItemHandler_Error(t *testing.T) {
 				Description: tc.description,
 			}
 
-			fields := test_utils.ConstructUpdateFieldsMap(tc.name, tc.description)
+			fields := testutils.ConstructUpdateFieldsMap(tc.name, tc.description)
 			mItemRepository.
 				EXPECT().
 				Update(gomock.Eq(tc.projectId), gomock.Eq(tc.itemId), gomock.Eq(fields)).
 				Return(tc.returnedError)
 
-			req := httptest.NewRequest("PATCH", fmt.Sprintf("/v1/projects/%d/%d", tc.projectId, tc.itemId), test_utils.ConvertStructToIoReader(requestBody))
+			req := httptest.NewRequest("PATCH", fmt.Sprintf("/v1/projects/%d/%d", tc.projectId, tc.itemId), testutils.ConvertStructToIoReader(requestBody))
 			rr := httptest.NewRecorder()
 
 			router.ServeHTTP(rr, req)
@@ -117,8 +117,8 @@ func TestUpdateItemHandler_BadRequest(t *testing.T) {
 			"both name and description are empty strings",
 			123,
 			345,
-			test_utils.CreatePointerOfString(""),
-			test_utils.CreatePointerOfString(""),
+			testutils.CreatePointerOfString(""),
+			testutils.CreatePointerOfString(""),
 			"name_and_description_empty",
 		},
 	}
@@ -134,7 +134,7 @@ func TestUpdateItemHandler_BadRequest(t *testing.T) {
 				Update(gomock.Eq(tc.projectId), gomock.Eq(tc.itemId), gomock.Any()).
 				Times(0)
 
-			req := httptest.NewRequest("PATCH", fmt.Sprintf("/v1/projects/%d/%d", tc.projectId, tc.itemId), test_utils.ConvertStructToIoReader(requestBody))
+			req := httptest.NewRequest("PATCH", fmt.Sprintf("/v1/projects/%d/%d", tc.projectId, tc.itemId), testutils.ConvertStructToIoReader(requestBody))
 			rr := httptest.NewRecorder()
 
 			router.ServeHTTP(rr, req)
@@ -178,51 +178,51 @@ func TestUpdateItemHandler_Success(t *testing.T) {
 			"update both name and description",
 			123,
 			345,
-			test_utils.CreatePointerOfString("name"),
-			test_utils.CreatePointerOfString("description"),
+			testutils.CreatePointerOfString("name"),
+			testutils.CreatePointerOfString("description"),
 			map[string]interface{}{
-				"name":        test_utils.CreatePointerOfString("name"),
-				"description": test_utils.CreatePointerOfString("description"),
+				"name":        testutils.CreatePointerOfString("name"),
+				"description": testutils.CreatePointerOfString("description"),
 			},
 		},
 		{
 			"update only name, description does not exist",
 			123,
 			345,
-			test_utils.CreatePointerOfString("name"),
+			testutils.CreatePointerOfString("name"),
 			nil,
 			map[string]interface{}{
-				"name": test_utils.CreatePointerOfString("name"),
+				"name": testutils.CreatePointerOfString("name"),
 			},
 		},
 		{
 			"update only name, description is an empty string",
 			123,
 			345,
-			test_utils.CreatePointerOfString("name"),
-			test_utils.CreatePointerOfString(""),
+			testutils.CreatePointerOfString("name"),
+			testutils.CreatePointerOfString(""),
 			map[string]interface{}{
-				"name": test_utils.CreatePointerOfString("name"),
+				"name": testutils.CreatePointerOfString("name"),
 			},
 		},
 		{
 			"update only description, name does not exist",
 			123,
 			345,
-			test_utils.CreatePointerOfString("name"),
+			testutils.CreatePointerOfString("name"),
 			nil,
 			map[string]interface{}{
-				"name": test_utils.CreatePointerOfString("name"),
+				"name": testutils.CreatePointerOfString("name"),
 			},
 		},
 		{
 			"update only description, name is an empty string",
 			123,
 			345,
-			test_utils.CreatePointerOfString("name"),
-			test_utils.CreatePointerOfString(""),
+			testutils.CreatePointerOfString("name"),
+			testutils.CreatePointerOfString(""),
 			map[string]interface{}{
-				"name": test_utils.CreatePointerOfString("name"),
+				"name": testutils.CreatePointerOfString("name"),
 			},
 		},
 	}
@@ -238,7 +238,7 @@ func TestUpdateItemHandler_Success(t *testing.T) {
 				Update(gomock.Eq(tc.projectId), gomock.Eq(tc.itemId), gomock.Eq(tc.expectedFieldUpdates)).
 				Return(nil)
 
-			req := httptest.NewRequest("PATCH", fmt.Sprintf("/v1/projects/%d/%d", tc.projectId, tc.itemId), test_utils.ConvertStructToIoReader(requestBody))
+			req := httptest.NewRequest("PATCH", fmt.Sprintf("/v1/projects/%d/%d", tc.projectId, tc.itemId), testutils.ConvertStructToIoReader(requestBody))
 			rr := httptest.NewRecorder()
 
 			router.ServeHTTP(rr, req)

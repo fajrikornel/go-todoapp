@@ -8,7 +8,7 @@ import (
 	. "github.com/fajrikornel/go-todoapp/internal/api/v1"
 	"github.com/fajrikornel/go-todoapp/internal/models"
 	mock_repository "github.com/fajrikornel/go-todoapp/test/mocks/repository"
-	"github.com/fajrikornel/go-todoapp/test/test_utils"
+	"github.com/fajrikornel/go-todoapp/test/testutils"
 	"github.com/golang/mock/gomock"
 	"github.com/julienschmidt/httprouter"
 	"net/http/httptest"
@@ -41,7 +41,7 @@ func TestCreateItemHandler_BadRequest(t *testing.T) {
 		},
 		{
 			"name exists but description does not exist",
-			test_utils.CreatePointerOfString("name"),
+			testutils.CreatePointerOfString("name"),
 			nil,
 			123,
 			"name_or_description_empty",
@@ -49,28 +49,28 @@ func TestCreateItemHandler_BadRequest(t *testing.T) {
 		{
 			"description exists but name does not exist",
 			nil,
-			test_utils.CreatePointerOfString("description"),
+			testutils.CreatePointerOfString("description"),
 			123,
 			"name_or_description_empty",
 		},
 		{
 			"name and description are empty strings",
-			test_utils.CreatePointerOfString(""),
-			test_utils.CreatePointerOfString(""),
+			testutils.CreatePointerOfString(""),
+			testutils.CreatePointerOfString(""),
 			123,
 			"name_or_description_empty",
 		},
 		{
 			"name exists but description is an empty string",
-			test_utils.CreatePointerOfString("name"),
-			test_utils.CreatePointerOfString(""),
+			testutils.CreatePointerOfString("name"),
+			testutils.CreatePointerOfString(""),
 			123,
 			"name_or_description_empty",
 		},
 		{
 			"description exists but name is an empty string",
-			test_utils.CreatePointerOfString(""),
-			test_utils.CreatePointerOfString("description"),
+			testutils.CreatePointerOfString(""),
+			testutils.CreatePointerOfString("description"),
 			123,
 			"name_or_description_empty",
 		},
@@ -87,7 +87,7 @@ func TestCreateItemHandler_BadRequest(t *testing.T) {
 				Create(gomock.Any()).
 				Times(0)
 
-			req := httptest.NewRequest("POST", fmt.Sprintf("/v1/projects/%d", tc.projectId), test_utils.ConvertStructToIoReader(requestBody))
+			req := httptest.NewRequest("POST", fmt.Sprintf("/v1/projects/%d", tc.projectId), testutils.ConvertStructToIoReader(requestBody))
 			rr := httptest.NewRecorder()
 
 			router.ServeHTTP(rr, req)
@@ -128,8 +128,8 @@ func TestCreateItemHandler_InternalServerError(t *testing.T) {
 	}{
 		{
 			"object repository returns error",
-			test_utils.CreatePointerOfString("name"),
-			test_utils.CreatePointerOfString("description"),
+			testutils.CreatePointerOfString("name"),
+			testutils.CreatePointerOfString("description"),
 			123,
 		},
 	}
@@ -149,7 +149,7 @@ func TestCreateItemHandler_InternalServerError(t *testing.T) {
 				})).
 				Return(errors.New("error_string"))
 
-			req := httptest.NewRequest("POST", fmt.Sprintf("/v1/projects/%d", tc.projectId), test_utils.ConvertStructToIoReader(requestBody))
+			req := httptest.NewRequest("POST", fmt.Sprintf("/v1/projects/%d", tc.projectId), testutils.ConvertStructToIoReader(requestBody))
 			rr := httptest.NewRecorder()
 
 			router.ServeHTTP(rr, req)
@@ -189,8 +189,8 @@ func TestCreateItemHandler_Success(t *testing.T) {
 	}{
 		{
 			"success case",
-			test_utils.CreatePointerOfString("name"),
-			test_utils.CreatePointerOfString("description"),
+			testutils.CreatePointerOfString("name"),
+			testutils.CreatePointerOfString("description"),
 			123,
 		},
 	}
@@ -212,7 +212,7 @@ func TestCreateItemHandler_Success(t *testing.T) {
 					m.ID = 345
 				})
 
-			req := httptest.NewRequest("POST", fmt.Sprintf("/v1/projects/%d", tc.projectId), test_utils.ConvertStructToIoReader(requestBody))
+			req := httptest.NewRequest("POST", fmt.Sprintf("/v1/projects/%d", tc.projectId), testutils.ConvertStructToIoReader(requestBody))
 			rr := httptest.NewRecorder()
 
 			router.ServeHTTP(rr, req)
