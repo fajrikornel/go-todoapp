@@ -26,42 +26,49 @@ func TestCreateItemHandler_BadRequest(t *testing.T) {
 	router.POST("/v1/projects/:projectId", handleFunc)
 
 	testCases := []struct {
+		testName    string
 		name        *string
 		description *string
 		projectId   int
 		error       string
 	}{
 		{
+			"name and description does not exist",
 			nil,
 			nil,
 			123,
 			"name_or_description_empty",
 		},
 		{
+			"name exists but description does not exist",
 			test_utils.CreatePointerOfString("name"),
 			nil,
 			123,
 			"name_or_description_empty",
 		},
 		{
+			"description exists but name does not exist",
 			nil,
 			test_utils.CreatePointerOfString("description"),
 			123,
 			"name_or_description_empty",
 		},
 		{
+			"name and description are empty strings",
 			test_utils.CreatePointerOfString(""),
 			test_utils.CreatePointerOfString(""),
 			123,
 			"name_or_description_empty",
 		},
 		{
+			"name exists but description is an empty string",
 			test_utils.CreatePointerOfString("name"),
 			test_utils.CreatePointerOfString(""),
 			123,
 			"name_or_description_empty",
 		},
 		{
+			"description exists but name is an empty string",
 			test_utils.CreatePointerOfString(""),
 			test_utils.CreatePointerOfString("description"),
 			123,
@@ -69,7 +76,7 @@ func TestCreateItemHandler_BadRequest(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		t.Run(test_utils.FormatNameAndDescription(tc.name, tc.description), func(t *testing.T) {
+		t.Run(tc.testName, func(t *testing.T) {
 			requestBody := CreateProjectRequestBody{
 				Name:        tc.name,
 				Description: tc.description,
@@ -114,18 +121,20 @@ func TestCreateItemHandler_InternalServerError(t *testing.T) {
 	router.POST("/v1/projects/:projectId", handleFunc)
 
 	testCases := []struct {
+		testName    string
 		name        *string
 		description *string
 		projectId   int
 	}{
 		{
+			"object repository returns error",
 			test_utils.CreatePointerOfString("name"),
 			test_utils.CreatePointerOfString("description"),
 			123,
 		},
 	}
 	for _, tc := range testCases {
-		t.Run(test_utils.FormatNameAndDescription(tc.name, tc.description), func(t *testing.T) {
+		t.Run(tc.testName, func(t *testing.T) {
 			requestBody := CreateProjectRequestBody{
 				Name:        tc.name,
 				Description: tc.description,
@@ -173,18 +182,20 @@ func TestCreateItemHandler_Success(t *testing.T) {
 	router.POST("/v1/projects/:projectId", handleFunc)
 
 	testCases := []struct {
+		testName    string
 		name        *string
 		description *string
 		projectId   int
 	}{
 		{
+			"success case",
 			test_utils.CreatePointerOfString("name"),
 			test_utils.CreatePointerOfString("description"),
 			123,
 		},
 	}
 	for _, tc := range testCases {
-		t.Run(test_utils.FormatNameAndDescription(tc.name, tc.description), func(t *testing.T) {
+		t.Run(tc.testName, func(t *testing.T) {
 			requestBody := CreateProjectRequestBody{
 				Name:        tc.name,
 				Description: tc.description,
