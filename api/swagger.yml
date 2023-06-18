@@ -55,6 +55,16 @@ paths:
                     success: false
                     data: {}
                     errors: "name_or_description_empty"
+        500:
+          description: "Could not save project"
+          content:
+            application/json:
+              examples:
+                "Invalid project ID":
+                  value:
+                    success: false
+                    data: { }
+                    errors: "internal_db_error"
   /v1/projects/{projectId}:
     post:
       summary: "Create an item"
@@ -108,13 +118,8 @@ paths:
                     success: false
                     data: {}
                     errors: "name_or_description_empty"
-                "Invalid project ID":
-                  value:
-                    success: false
-                    data: {}
-                    errors: "error string"
         500:
-          description: "Could not save item"
+          description: "Could not save item, possibly project ID not found"
           content:
             application/json:
               examples:
@@ -122,7 +127,7 @@ paths:
                   value:
                     success: false
                     data: {}
-                    errors: "error string"
+                    errors: "internal_db_error"
     get:
       summary: "Get details of a project"
       description: "List a project's name, description, and items"
@@ -151,8 +156,8 @@ paths:
             application/json:
                 schema:
                   $ref: "#/components/schemas/GetProjectResponse"
-        400:
-          description: "Bad request"
+        404:
+          description: "Not found"
           content:
             application/json:
               examples:
@@ -160,7 +165,17 @@ paths:
                   value:
                     success: false
                     data: {}
-                    errors: "error string"
+                    errors: "project_not_found"
+        500:
+          description: "Could not get project"
+          content:
+            application/json:
+              examples:
+                "Internal DB error":
+                  value:
+                    success: false
+                    data: { }
+                    errors: "internal_db_error"
     patch:
       summary: "Update a project"
       description: "Update a project's name, description, or both"
@@ -201,23 +216,32 @@ paths:
           content:
             application/json:
               examples:
-                "Did not send name, description, or both":
+                "Did not send name and description":
                   value:
                     success: false
-                    errors: "name_or_description_empty"
+                    errors: "name_and_description_empty"
                 "Sent empty name and empty description":
                   value:
                     success: false
-                    errors: "name_or_description_empty"
-        500:
-          description: "Could not update project, possibly due to nonexistent project"
+                    errors: "name_and_description_empty"
+        404:
+          description: "Not found"
           content:
             application/json:
               examples:
-                "Could not update project":
+                "Project not found":
                   value:
                     success: false
-                    errors: "error string"
+                    errors: "project_not_found"
+        500:
+          description: "Could not update project"
+          content:
+            application/json:
+              examples:
+                "Internal DB error":
+                  value:
+                    success: false
+                    errors: "internal_db_error"
     delete:
       summary: "Delete a project"
       description: "Delete a project"
@@ -248,24 +272,24 @@ paths:
                 "Success":
                   value:
                     success: true
-        400:
-          description: "Bad request"
+        404:
+          description: "Not found"
           content:
             application/json:
               examples:
                 "Project nonexistent":
                   value:
                     success: false
-                    errors: "error string"
+                    errors: "project_not_found"
         500:
           description: "Could not delete project"
           content:
             application/json:
               examples:
-                "Could not delete project":
+                "Internal DB error":
                   value:
                     success: false
-                    errors: "error string"
+                    errors: "internal_db_error"
   /v1/projects/{projectId}/{itemId}:
     get:
       summary: "Get details of an item"
@@ -302,8 +326,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetItemResponse"
-        400:
-          description: "Bad request"
+        404:
+          description: "Not found"
           content:
             application/json:
               examples:
@@ -311,7 +335,17 @@ paths:
                   value:
                     success: false
                     data: {}
-                    errors: "error string"
+                    errors: "item_or_project_not_found"
+        500:
+          description: "Could not get item"
+          content:
+            application/json:
+              examples:
+                "Internal DB error":
+                  value:
+                    success: false
+                    data: { }
+                    errors: "internal_db_error"
     patch:
       summary: "Update an item"
       description: "Update an item's name, description, or both"
@@ -359,23 +393,32 @@ paths:
           content:
             application/json:
               examples:
-                "Did not send name, description, or both":
+                "Did not send name and description":
                   value:
                     success: false
-                    errors: "name_or_description_empty"
+                    errors: "name_and_description_empty"
                 "Sent empty name and empty description":
                   value:
                     success: false
-                    errors: "name_or_description_empty"
-        500:
-          description: "Could not update item, possibly due to nonexistent item"
+                    errors: "name_and_description_empty"
+        404:
+          description: "Not found"
           content:
             application/json:
               examples:
-                "Could not update item":
+                "No matching item and project ID found":
                   value:
                     success: false
-                    errors: "error string"
+                    errors: "item_or_project_not_found"
+        500:
+          description: "Could not update item"
+          content:
+            application/json:
+              examples:
+                "Internal DB error":
+                  value:
+                    success: false
+                    errors: "internal_db_error"
     delete:
       summary: "Delete an item"
       description: "Delete an item"
@@ -413,24 +456,24 @@ paths:
                 "Success":
                   value:
                     success: true
-        400:
-          description: "Bad request"
+        404:
+          description: "Not found"
           content:
             application/json:
               examples:
-                "Item with corresponding item and project ID nonexistent":
+                "No matching item and project ID found":
                   value:
                     success: false
-                    errors: "error string"
+                    errors: "item_or_project_not_found"
         500:
           description: "Could not delete item"
           content:
             application/json:
               examples:
-                "Could not delete project":
+                "Internal DB error":
                   value:
                     success: false
-                    errors: "error string"
+                    errors: "internal_db_error"
 
 components:
   schemas:
