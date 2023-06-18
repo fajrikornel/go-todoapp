@@ -10,3 +10,13 @@ services:
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: todoapp
+
+  db-test:
+    image: "postgres:9.5"
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./.docker-data/postgres-test:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: todoapp_test

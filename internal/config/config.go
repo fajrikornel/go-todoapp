@@ -9,8 +9,9 @@ import (
 )
 
 type Config struct {
-	AppPort  int      `yaml:"APP_PORT"`
-	DbConfig DbConfig `yaml:"DB_CONFIG"`
+	AppPort      int      `yaml:"APP_PORT"`
+	DbConfig     DbConfig `yaml:"DB_CONFIG"`
+	TestDbConfig DbConfig `yaml:"TEST_DB_CONFIG"`
 }
 
 type DbConfig struct {
@@ -47,4 +48,8 @@ func GetAppPort() int {
 
 func GetDbConfig() DbConfig {
 	return config.DbConfig
+}
+
+func GetTestDbConfig() DbConfig {
+	return config.TestDbConfig
 }

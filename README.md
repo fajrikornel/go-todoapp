@@ -16,9 +16,16 @@ docker-compose up -d
 
 ### Execute DB migrations
 
+DB migrations
 ```
 go build -o build/migrate cmd/migrate/migrate.go
 build/migrate
+```
+
+Test environment DB migrations
+```
+go build -o build/test_migrate cmd/testmigrate/test_migrate.go
+build/test_migrate
 ```
 
 ### Run tests
