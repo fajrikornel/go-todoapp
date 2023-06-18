@@ -105,7 +105,7 @@ func TestCreateItemHandler_BadRequest(t *testing.T) {
 			}
 
 			if !reflect.DeepEqual(expectedResponse, actualResponse) {
-				t.Errorf("Unexpected HTTP return code. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
+				t.Errorf("Unexpected HTTP response. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
 			}
 		})
 	}
@@ -166,7 +166,7 @@ func TestCreateItemHandler_InternalServerError(t *testing.T) {
 				Error:   "error_string",
 			}
 			if !reflect.DeepEqual(expectedResponse, actualResponse) {
-				t.Errorf("Unexpected HTTP return code. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
+				t.Errorf("Unexpected HTTP response. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
 			}
 		})
 	}
@@ -229,7 +229,7 @@ func TestCreateItemHandler_Success(t *testing.T) {
 				Data:    CreateItemResponseData{ItemID: 345},
 			}
 			if !reflect.DeepEqual(expectedResponse, actualResponse) {
-				t.Errorf("Unexpected HTTP return code. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
+				t.Errorf("Unexpected HTTP response. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
 			}
 		})
 	}

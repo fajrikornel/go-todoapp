@@ -97,7 +97,7 @@ func TestCreateProjectHandler_BadRequest(t *testing.T) {
 			}
 
 			if !reflect.DeepEqual(expectedResponse, actualResponse) {
-				t.Errorf("Unexpected HTTP return code. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
+				t.Errorf("Unexpected HTTP response. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
 			}
 		})
 	}
@@ -155,7 +155,7 @@ func TestCreateProjectHandler_InternalServerError(t *testing.T) {
 				Error:   "error_string",
 			}
 			if !reflect.DeepEqual(expectedResponse, actualResponse) {
-				t.Errorf("Unexpected HTTP return code. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
+				t.Errorf("Unexpected HTTP response. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
 			}
 		})
 	}
@@ -215,7 +215,7 @@ func TestCreateProjectHandler_Success(t *testing.T) {
 				Data:    CreateProjectResponseData{ProjectID: 123},
 			}
 			if !reflect.DeepEqual(expectedResponse, actualResponse) {
-				t.Errorf("Unexpected HTTP return code. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
+				t.Errorf("Unexpected HTTP response. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
 			}
 		})
 	}
