@@ -15,18 +15,19 @@ import (
 	"testing"
 )
 
-func TestUpdateProjectHandler_Error(t *testing.T) {
+func TestUpdateItemHandler_Error(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mProjectRepository := mock_repository.NewMockProjectRepository(ctrl)
+	mItemRepository := mock_repository.NewMockItemRepository(ctrl)
 
-	handleFunc := UpdateProjectHandler(mProjectRepository)
+	handleFunc := UpdateItemHandler(mItemRepository)
 
 	router := httprouter.New()
-	router.PATCH("/v1/projects/:projectId", handleFunc)
+	router.PATCH("/v1/projects/:projectId/:itemId", handleFunc)
 
 	testCases := []struct {
 		testName         string
 		projectId        int
+		itemId           int
 		name             *string
 		description      *string
 		returnedError    error
@@ -35,6 +36,7 @@ func TestUpdateProjectHandler_Error(t *testing.T) {
 		{
 			"project does not exist in database",
 			123,
+			345,
 			test_utils.CreatePointerOfString("name"),
 			test_utils.CreatePointerOfString("description"),
 			gorm.ErrRecordNotFound,
@@ -43,6 +45,7 @@ func TestUpdateProjectHandler_Error(t *testing.T) {
 		{
 			"error while calling database",
 			123,
+			345,
 			test_utils.CreatePointerOfString("name"),
 			test_utils.CreatePointerOfString("description"),
 			gorm.ErrUnsupportedDriver,
@@ -51,18 +54,18 @@ func TestUpdateProjectHandler_Error(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.testName, func(t *testing.T) {
-			requestBody := UpdateProjectRequestBody{
+			requestBody := UpdateItemRequestBody{
 				Name:        tc.name,
 				Description: tc.description,
 			}
 
 			fields := test_utils.ConstructUpdateFieldsMap(tc.name, tc.description)
-			mProjectRepository.
+			mItemRepository.
 				EXPECT().
-				Update(gomock.Eq(tc.projectId), gomock.Eq(fields)).
+				Update(gomock.Eq(tc.projectId), gomock.Eq(tc.itemId), gomock.Eq(fields)).
 				Return(tc.returnedError)
 
-			req := httptest.NewRequest("PATCH", fmt.Sprintf("/v1/projects/%d", tc.projectId), test_utils.ConvertStructToIoReader(requestBody))
+			req := httptest.NewRequest("PATCH", fmt.Sprintf("/v1/projects/%d/%d", tc.projectId, tc.itemId), test_utils.ConvertStructToIoReader(requestBody))
 			rr := httptest.NewRecorder()
 
 			router.ServeHTTP(rr, req)
@@ -71,10 +74,10 @@ func TestUpdateProjectHandler_Error(t *testing.T) {
 				t.Errorf("Unexpected HTTP return code. Expected: %d, actual: %d", tc.expectedHttpCode, rr.Code)
 			}
 
-			var actualResponse utils.GenericResponse[UpdateProjectResponseData]
+			var actualResponse utils.GenericResponse[UpdateItemResponseData]
 			json.Unmarshal(rr.Body.Bytes(), &actualResponse)
 
-			expectedResponse := utils.GenericResponse[UpdateProjectResponseData]{
+			expectedResponse := utils.GenericResponse[UpdateItemResponseData]{
 				Success: false,
 				Error:   tc.returnedError.Error(),
 			}
@@ -85,18 +88,19 @@ func TestUpdateProjectHandler_Error(t *testing.T) {
 	}
 }
 
-func TestUpdateProjectHandler_BadRequest(t *testing.T) {
+func TestUpdateItemHandler_BadRequest(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mProjectRepository := mock_repository.NewMockProjectRepository(ctrl)
+	mItemRepository := mock_repository.NewMockItemRepository(ctrl)
 
-	handleFunc := UpdateProjectHandler(mProjectRepository)
+	handleFunc := UpdateItemHandler(mItemRepository)
 
 	router := httprouter.New()
-	router.PATCH("/v1/projects/:projectId", handleFunc)
+	router.PATCH("/v1/projects/:projectId/:itemId", handleFunc)
 
 	testCases := []struct {
 		testName    string
 		projectId   int
+		itemId      int
 		name        *string
 		description *string
 		error       string
@@ -104,6 +108,7 @@ func TestUpdateProjectHandler_BadRequest(t *testing.T) {
 		{
 			"both name and description does not exist",
 			123,
+			345,
 			nil,
 			nil,
 			"name_and_description_empty",
@@ -111,6 +116,7 @@ func TestUpdateProjectHandler_BadRequest(t *testing.T) {
 		{
 			"both name and description are empty strings",
 			123,
+			345,
 			test_utils.CreatePointerOfString(""),
 			test_utils.CreatePointerOfString(""),
 			"name_and_description_empty",
@@ -118,17 +124,17 @@ func TestUpdateProjectHandler_BadRequest(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.testName, func(t *testing.T) {
-			requestBody := UpdateProjectRequestBody{
+			requestBody := UpdateItemRequestBody{
 				Name:        tc.name,
 				Description: tc.description,
 			}
 
-			mProjectRepository.
+			mItemRepository.
 				EXPECT().
-				Update(gomock.Eq(tc.projectId), gomock.Any()).
+				Update(gomock.Eq(tc.projectId), gomock.Eq(tc.itemId), gomock.Any()).
 				Times(0)
 
-			req := httptest.NewRequest("PATCH", fmt.Sprintf("/v1/projects/%d", tc.projectId), test_utils.ConvertStructToIoReader(requestBody))
+			req := httptest.NewRequest("PATCH", fmt.Sprintf("/v1/projects/%d/%d", tc.projectId, tc.itemId), test_utils.ConvertStructToIoReader(requestBody))
 			rr := httptest.NewRecorder()
 
 			router.ServeHTTP(rr, req)
@@ -137,10 +143,10 @@ func TestUpdateProjectHandler_BadRequest(t *testing.T) {
 				t.Errorf("Unexpected HTTP return code. Expected: %d, actual: %d", 400, rr.Code)
 			}
 
-			var actualResponse utils.GenericResponse[UpdateProjectResponseData]
+			var actualResponse utils.GenericResponse[UpdateItemResponseData]
 			json.Unmarshal(rr.Body.Bytes(), &actualResponse)
 
-			expectedResponse := utils.GenericResponse[UpdateProjectResponseData]{
+			expectedResponse := utils.GenericResponse[UpdateItemResponseData]{
 				Success: false,
 				Error:   tc.error,
 			}
@@ -151,18 +157,19 @@ func TestUpdateProjectHandler_BadRequest(t *testing.T) {
 	}
 }
 
-func TestUpdateProjectHandler_Success(t *testing.T) {
+func TestUpdateItemHandler_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mProjectRepository := mock_repository.NewMockProjectRepository(ctrl)
+	mItemRepository := mock_repository.NewMockItemRepository(ctrl)
 
-	handleFunc := UpdateProjectHandler(mProjectRepository)
+	handleFunc := UpdateItemHandler(mItemRepository)
 
 	router := httprouter.New()
-	router.PATCH("/v1/projects/:projectId", handleFunc)
+	router.PATCH("/v1/projects/:projectId/:itemId", handleFunc)
 
 	testCases := []struct {
 		testName             string
 		projectId            int
+		itemId               int
 		name                 *string
 		description          *string
 		expectedFieldUpdates map[string]interface{}
@@ -170,6 +177,7 @@ func TestUpdateProjectHandler_Success(t *testing.T) {
 		{
 			"update both name and description",
 			123,
+			345,
 			test_utils.CreatePointerOfString("name"),
 			test_utils.CreatePointerOfString("description"),
 			map[string]interface{}{
@@ -180,6 +188,7 @@ func TestUpdateProjectHandler_Success(t *testing.T) {
 		{
 			"update only name, description does not exist",
 			123,
+			345,
 			test_utils.CreatePointerOfString("name"),
 			nil,
 			map[string]interface{}{
@@ -189,6 +198,7 @@ func TestUpdateProjectHandler_Success(t *testing.T) {
 		{
 			"update only name, description is an empty string",
 			123,
+			345,
 			test_utils.CreatePointerOfString("name"),
 			test_utils.CreatePointerOfString(""),
 			map[string]interface{}{
@@ -198,6 +208,7 @@ func TestUpdateProjectHandler_Success(t *testing.T) {
 		{
 			"update only description, name does not exist",
 			123,
+			345,
 			test_utils.CreatePointerOfString("name"),
 			nil,
 			map[string]interface{}{
@@ -207,6 +218,7 @@ func TestUpdateProjectHandler_Success(t *testing.T) {
 		{
 			"update only description, name is an empty string",
 			123,
+			345,
 			test_utils.CreatePointerOfString("name"),
 			test_utils.CreatePointerOfString(""),
 			map[string]interface{}{
@@ -216,17 +228,17 @@ func TestUpdateProjectHandler_Success(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.testName, func(t *testing.T) {
-			requestBody := UpdateProjectRequestBody{
+			requestBody := UpdateItemRequestBody{
 				Name:        tc.name,
 				Description: tc.description,
 			}
 
-			mProjectRepository.
+			mItemRepository.
 				EXPECT().
-				Update(gomock.Eq(tc.projectId), gomock.Eq(tc.expectedFieldUpdates)).
+				Update(gomock.Eq(tc.projectId), gomock.Eq(tc.itemId), gomock.Eq(tc.expectedFieldUpdates)).
 				Return(nil)
 
-			req := httptest.NewRequest("PATCH", fmt.Sprintf("/v1/projects/%d", tc.projectId), test_utils.ConvertStructToIoReader(requestBody))
+			req := httptest.NewRequest("PATCH", fmt.Sprintf("/v1/projects/%d/%d", tc.projectId, tc.itemId), test_utils.ConvertStructToIoReader(requestBody))
 			rr := httptest.NewRecorder()
 
 			router.ServeHTTP(rr, req)
@@ -235,12 +247,12 @@ func TestUpdateProjectHandler_Success(t *testing.T) {
 				t.Errorf("Unexpected HTTP return code. Expected: %d, actual: %d", 200, rr.Code)
 			}
 
-			var actualResponse utils.GenericResponse[UpdateProjectResponseData]
+			var actualResponse utils.GenericResponse[UpdateItemResponseData]
 			json.Unmarshal(rr.Body.Bytes(), &actualResponse)
 
-			expectedResponse := utils.GenericResponse[UpdateProjectResponseData]{
+			expectedResponse := utils.GenericResponse[UpdateItemResponseData]{
 				Success: true,
-				Data:    UpdateProjectResponseData{},
+				Data:    UpdateItemResponseData{},
 			}
 			if !reflect.DeepEqual(expectedResponse, actualResponse) {
 				t.Errorf("Unexpected HTTP response. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
