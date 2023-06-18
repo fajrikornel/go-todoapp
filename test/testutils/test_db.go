@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func SetupTestProjectRepository(tb testing.TB) (repository.ProjectRepository, func(tb testing.TB)) {
+func SetupTestProjectAndItemRepository(tb testing.TB) (repository.ProjectRepository, repository.ItemRepository, func(tb testing.TB)) {
 	testDbConfig := config.GetTestDbConfig()
 
 	sqlStore, err := db.GetSqlStore(&testDbConfig)
@@ -18,48 +18,35 @@ func SetupTestProjectRepository(tb testing.TB) (repository.ProjectRepository, fu
 	}
 
 	projectRepository := repository.NewProjectRepository(sqlStore)
+	itemRepository := repository.NewItemRepository(sqlStore)
 
 	teardownProjectRepositoryFunc := getTeardownFunction(sqlStore)
 
-	return projectRepository, teardownProjectRepositoryFunc
-}
-
-func SetupTestItemRepository(tb testing.TB) (repository.ItemRepository, func(tb testing.TB)) {
-	testDbConfig := config.GetTestDbConfig()
-
-	sqlStore, err := db.GetSqlStore(&testDbConfig)
-	if err != nil {
-		panic("Cannot instantiate test sqlStore")
-	}
-
-	itemRepository := repository.NewItemRepository(sqlStore)
-
-	teardownItemRepositoryFunc := getTeardownFunction(sqlStore)
-
-	return itemRepository, teardownItemRepositoryFunc
+	return projectRepository, itemRepository, teardownProjectRepositoryFunc
 }
 
 func getTeardownFunction(sqlStore *db.SqlStore) func(tb testing.TB) {
 	var projectIds []uint
-	var itemIds []uint
+	itemIds := make(map[uint]uint)
 
 	sqlStore.Db.Callback().Create().After("gorm:create").Register("rememberCreatedObjects", func(db *gorm.DB) {
 		switch db.Statement.Schema.Table {
 		case "projects":
 			projectIds = append(projectIds, db.Statement.Dest.(*models.Project).ID)
 		case "items":
-			itemIds = append(itemIds, db.Statement.Dest.(*models.Item).ID)
+			item := db.Statement.Dest.(*models.Item)
+			itemIds[item.ID] = item.ProjectID
 		}
 	})
 
-	teardownProjectRepositoryFunc := func(tb testing.TB) {
+	teardownFunc := func(tb testing.TB) {
+		for itemId, projectId := range itemIds {
+			sqlStore.Db.Unscoped().Delete(&models.Item{ID: itemId, ProjectID: projectId})
+		}
+
 		for _, projectId := range projectIds {
 			sqlStore.Db.Unscoped().Delete(&models.Project{ID: projectId})
 		}
-
-		for _, itemId := range itemIds {
-			sqlStore.Db.Unscoped().Delete(&models.Project{ID: itemId})
-		}
 	}
-	return teardownProjectRepositoryFunc
+	return teardownFunc
 }
