@@ -2,7 +2,6 @@ package v1
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/fajrikornel/go-todoapp/internal/api/utils"
 	. "github.com/fajrikornel/go-todoapp/internal/api/v1"
@@ -10,12 +9,13 @@ import (
 	mock_repository "github.com/fajrikornel/go-todoapp/test/mocks/repository"
 	"github.com/golang/mock/gomock"
 	"github.com/julienschmidt/httprouter"
+	"gorm.io/gorm"
 	"net/http/httptest"
 	"reflect"
 	"testing"
 )
 
-func TestGetProjectHandler_BadRequest(t *testing.T) {
+func TestGetProjectHandler_Error(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mProjectRepository := mock_repository.NewMockProjectRepository(ctrl)
 
@@ -25,12 +25,22 @@ func TestGetProjectHandler_BadRequest(t *testing.T) {
 	router.GET("/v1/projects/:projectId", handleFunc)
 
 	testCases := []struct {
-		testName  string
-		projectId int
+		testName         string
+		projectId        int
+		returnedError    error
+		expectedHttpCode int
 	}{
 		{
 			"project does not exist in database",
 			123,
+			gorm.ErrRecordNotFound,
+			400,
+		},
+		{
+			"error while calling database",
+			123,
+			gorm.ErrUnsupportedDriver,
+			500,
 		},
 	}
 	for _, tc := range testCases {
@@ -39,15 +49,15 @@ func TestGetProjectHandler_BadRequest(t *testing.T) {
 			mProjectRepository.
 				EXPECT().
 				FindById(gomock.Eq(tc.projectId)).
-				Return(nil, errors.New("error_string"))
+				Return(nil, tc.returnedError)
 
 			req := httptest.NewRequest("GET", fmt.Sprintf("/v1/projects/%d", tc.projectId), nil)
 			rr := httptest.NewRecorder()
 
 			router.ServeHTTP(rr, req)
 
-			if 400 != rr.Code {
-				t.Errorf("Unexpected HTTP return code. Expected: %d, actual: %d", 400, rr.Code)
+			if tc.expectedHttpCode != rr.Code {
+				t.Errorf("Unexpected HTTP return code. Expected: %d, actual: %d", tc.expectedHttpCode, rr.Code)
 			}
 
 			var actualResponse utils.GenericResponse[GetProjectResponseData]
@@ -55,7 +65,7 @@ func TestGetProjectHandler_BadRequest(t *testing.T) {
 
 			expectedResponse := utils.GenericResponse[GetProjectResponseData]{
 				Success: false,
-				Error:   "error_string",
+				Error:   tc.returnedError.Error(),
 			}
 			if !reflect.DeepEqual(expectedResponse, actualResponse) {
 				t.Errorf("Unexpected HTTP response. Expected: %+v, actual: %+v", expectedResponse, actualResponse)
