@@ -1,0 +1,9 @@
+setup.kibana.host: "kibana:5601"
+output.elasticsearch.hosts:
+  - "elasticsearch:9200"
+
+filebeat.inputs:
+  - type: filestream
+    id: todoapp-logs
+    paths:
+      - /var/log/filebeat/*

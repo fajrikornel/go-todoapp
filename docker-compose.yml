@@ -7,7 +7,7 @@ services:
     volumes:
       - ./.docker-data/app:/app/logs
     networks:
-      - network
+      - app-network
     build:
       context: "."
       dockerfile: "build/Dockerfile"
@@ -25,7 +25,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: todoapp
     networks:
-      - network
+      - app-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 5s
@@ -41,7 +41,53 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: todoapp_test
     networks:
-      - network
+      - app-network
+
+  elasticsearch:
+    image: "docker.elastic.co/elasticsearch/elasticsearch:8.8.2"
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./.docker-data/elasticsearch:/usr/share/elasticsearch/data
+    environment: [
+      'discovery.type=single-node',
+      'xpack.security.enabled=false',
+      'xpack.security.enrollment.enabled=false'
+    ]
+    networks:
+      - monitoring-network
+    healthcheck:
+      test: curl -s localhost:9200/_cluster/health >/dev/null || exit 1
+      interval: 5s
+      timeout: 60s
+      retries: 5
+      start_period: 5s
+
+  filebeat:
+    image: "docker.elastic.co/beats/filebeat:8.8.2"
+    volumes:
+      - ./.docker-data/app:/var/log/filebeat:ro
+      - ./config/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro
+    networks:
+      - monitoring-network
+    depends_on:
+      app:
+        condition: service_started
+      elasticsearch:
+        condition: service_healthy
+
+  kibana:
+    image: "docker.elastic.co/kibana/kibana:8.8.2"
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    networks:
+      - monitoring-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
 
 networks:
-  network: {}
+  app-network: {}
+  monitoring-network: {}
