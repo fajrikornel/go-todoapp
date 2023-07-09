@@ -24,3 +24,4 @@ go.work
 .docker-data/
 config/application.yml
 build/
+logs/

@@ -3,6 +3,10 @@ package logging
 import (
 	"context"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"log"
+	"os"
+	"time"
 )
 
 type ZapLogger struct {
@@ -10,7 +14,25 @@ type ZapLogger struct {
 }
 
 func NewZapLogger() *ZapLogger {
-	z, _ := zap.NewProduction()
+	pe := zap.NewProductionEncoderConfig()
+	pe.EncodeTime = zapcore.ISO8601TimeEncoder
+
+	fileEncoder := zapcore.NewJSONEncoder(pe)
+	consoleEncoder := zapcore.NewConsoleEncoder(pe)
+
+	_ = os.Mkdir("logs/", 0751)
+	logName := "logs/" + time.Now().UTC().Format(time.RFC3339) + ".log"
+	file, err := os.OpenFile(logName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0751)
+	if err != nil {
+		log.Fatalf("FAILED INITIALIZING LOGGER: %s", err.Error())
+	}
+
+	core := zapcore.NewTee(
+		zapcore.NewCore(fileEncoder, zapcore.AddSync(file), zap.DebugLevel),
+		zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), zap.DebugLevel),
+	)
+
+	z := zap.New(core)
 	s := z.Sugar()
 
 	return &ZapLogger{
