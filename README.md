@@ -66,6 +66,22 @@ build/server
 docker-compose down
 ```
 
+### Usage
+
+Using the app:
+```
+curl localhost:8080/v1/projects/1
+```
+For API details, see the Swagger file in the api/ folder of this repo.
+
+Log monitoring:
+```
+1. Visit Kibana on localhost:5601 using a browser
+2. Go to side pane > Analytics > Discover
+3. Observe or query the logs
+```
+Provided that the monitoring stack is turned on (see above instructions).
+
 ### Author notes
 
 In this project, I'm trying to create a service that is developed in a healthy way. Some of the traits I'm trying to achieve:
