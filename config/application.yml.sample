@@ -1,5 +1,7 @@
 APP_PORT: 8080
 
+ENABLE_ZAP_LOGGER: true
+
 DB_CONFIG:
     DB_HOST: 'localhost'
     DB_NAME: 'todoapp'

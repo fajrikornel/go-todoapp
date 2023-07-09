@@ -9,9 +9,10 @@ import (
 )
 
 type Config struct {
-	AppPort      int      `yaml:"APP_PORT"`
-	DbConfig     DbConfig `yaml:"DB_CONFIG"`
-	TestDbConfig DbConfig `yaml:"TEST_DB_CONFIG"`
+	AppPort         int      `yaml:"APP_PORT"`
+	EnableZapLogger bool     `yaml:"ENABLE_ZAP_LOGGER"`
+	DbConfig        DbConfig `yaml:"DB_CONFIG"`
+	TestDbConfig    DbConfig `yaml:"TEST_DB_CONFIG"`
 }
 
 type DbConfig struct {
@@ -44,6 +45,10 @@ func init() {
 
 func GetAppPort() int {
 	return config.AppPort
+}
+
+func GetEnableZapLogger() bool {
+	return config.EnableZapLogger
 }
 
 func GetDbConfig() DbConfig {

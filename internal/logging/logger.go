@@ -2,6 +2,7 @@ package logging
 
 import (
 	"context"
+	"github.com/fajrikornel/go-todoapp/internal/config"
 )
 
 type Logger interface {
@@ -12,7 +13,12 @@ type Logger interface {
 var logger Logger
 
 func init() {
-	logger = NewDefaultLogger()
+	zapLoggerEnabled := config.GetEnableZapLogger()
+	if zapLoggerEnabled {
+		logger = NewZapLogger()
+	} else {
+		logger = NewDefaultLogger()
+	}
 }
 
 func Infof(ctx context.Context, format string, args ...interface{}) {
