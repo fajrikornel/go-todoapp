@@ -46,12 +46,12 @@ go test -p 1 -v ./test/...
 
 To run it with the docker-compose environment:
 ```
-docker-compose up -d app db
+docker-compose up -d --build app db
 ```
 
 To run it with the docker-compose environment and with log monitoring:
 ```
-docker-compose up -d app db elasticsearch kibana filebeat
+docker-compose up -d --build app db elasticsearch kibana filebeat
 ```
 
 To run it without the docker-compose environment:
