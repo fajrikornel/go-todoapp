@@ -17,6 +17,7 @@ type GetItemResponseData struct {
 }
 
 func GetItemHandler(repository repository.ItemRepository) httprouter.Handle {
+	apiName := "get_item"
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 		projectId, _ := strconv.Atoi(p.ByName("projectId"))
@@ -33,6 +34,7 @@ func GetItemHandler(repository repository.ItemRepository) httprouter.Handle {
 			}
 
 			utils.ReturnErrorResponse(r.Context(), w, httpCode, responseBody, err)
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
@@ -42,5 +44,6 @@ func GetItemHandler(repository repository.ItemRepository) httprouter.Handle {
 			Description: item.Description,
 		}}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
+		utils.IncrementApiSuccessMetric(apiName)
 	}
 }

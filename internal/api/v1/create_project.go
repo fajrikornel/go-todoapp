@@ -20,6 +20,7 @@ type CreateProjectResponseData struct {
 }
 
 func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Handle {
+	apiName := "create_project"
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		var requestBody CreateProjectRequestBody
 
@@ -27,18 +28,21 @@ func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 		if err != nil {
 			responseBody := utils.GenericResponse[CreateProjectResponseData]{Success: false, Error: "invalid_request_format"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
 		if requestBody.Name == nil || requestBody.Description == nil {
 			responseBody := utils.GenericResponse[CreateProjectResponseData]{Success: false, Error: "name_or_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_or_description_empty"))
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
 		if *requestBody.Name == "" || *requestBody.Description == "" {
 			responseBody := utils.GenericResponse[CreateProjectResponseData]{Success: false, Error: "name_or_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_or_description_empty"))
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
@@ -51,10 +55,12 @@ func CreateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 		if err != nil {
 			responseBody := utils.GenericResponse[CreateProjectResponseData]{Success: false, Error: "internal_db_error"}
 			utils.ReturnErrorResponse(r.Context(), w, 500, responseBody, err)
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
 		responseBody := utils.GenericResponse[CreateProjectResponseData]{Success: true, Data: CreateProjectResponseData{ProjectID: project.ID}}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
+		utils.IncrementApiSuccessMetric(apiName)
 	}
 }

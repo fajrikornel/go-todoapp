@@ -13,6 +13,7 @@ import (
 type DeleteItemResponseData struct{}
 
 func DeleteItemHandler(repository repository.ItemRepository) httprouter.Handle {
+	apiName := "delete_item"
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 		projectId, _ := strconv.Atoi(p.ByName("projectId"))
@@ -29,10 +30,12 @@ func DeleteItemHandler(repository repository.ItemRepository) httprouter.Handle {
 			}
 
 			utils.ReturnErrorResponse(r.Context(), w, httpCode, responseBody, err)
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
 		responseBody := utils.GenericResponse[DeleteItemResponseData]{Success: true}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
+		utils.IncrementApiSuccessMetric(apiName)
 	}
 }

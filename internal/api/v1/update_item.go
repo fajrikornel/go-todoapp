@@ -19,6 +19,7 @@ type UpdateItemRequestBody struct {
 type UpdateItemResponseData struct{}
 
 func UpdateItemHandler(repository repository.ItemRepository) httprouter.Handle {
+	apiName := "update_item"
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		var requestBody UpdateItemRequestBody
 
@@ -26,6 +27,7 @@ func UpdateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		if err != nil {
 			responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: false, Error: "invalid_request_format"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
@@ -35,6 +37,7 @@ func UpdateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		if requestBody.Name == nil && requestBody.Description == nil {
 			responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: false, Error: "name_and_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_and_description_empty"))
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
@@ -50,6 +53,7 @@ func UpdateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		if len(fields) == 0 {
 			responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: false, Error: "name_and_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_and_description_empty"))
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
@@ -64,10 +68,12 @@ func UpdateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 			}
 
 			utils.ReturnErrorResponse(r.Context(), w, httpCode, responseBody, err)
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
 		responseBody := utils.GenericResponse[UpdateItemResponseData]{Success: true}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
+		utils.IncrementApiSuccessMetric(apiName)
 	}
 }

@@ -19,6 +19,7 @@ type UpdateProjectRequestBody struct {
 type UpdateProjectResponseData struct{}
 
 func UpdateProjectHandler(repository repository.ProjectRepository) httprouter.Handle {
+	apiName := "update_project"
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		var requestBody UpdateProjectRequestBody
 
@@ -26,6 +27,7 @@ func UpdateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 		if err != nil {
 			responseBody := utils.GenericResponse[UpdateProjectResponseData]{Success: false, Error: "invalid_request_format"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
@@ -34,6 +36,7 @@ func UpdateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 		if requestBody.Name == nil && requestBody.Description == nil {
 			responseBody := utils.GenericResponse[UpdateProjectResponseData]{Success: false, Error: "name_and_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_and_description_empty"))
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
@@ -49,6 +52,7 @@ func UpdateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 		if len(fields) == 0 {
 			responseBody := utils.GenericResponse[UpdateProjectResponseData]{Success: false, Error: "name_and_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_and_description_empty"))
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
@@ -63,10 +67,12 @@ func UpdateProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 			}
 
 			utils.ReturnErrorResponse(r.Context(), w, httpCode, responseBody, err)
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
 		responseBody := utils.GenericResponse[UpdateProjectResponseData]{Success: true}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
+		utils.IncrementApiSuccessMetric(apiName)
 	}
 }

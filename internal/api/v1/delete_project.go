@@ -13,6 +13,7 @@ import (
 type DeleteProjectResponseData struct{}
 
 func DeleteProjectHandler(repository repository.ProjectRepository) httprouter.Handle {
+	apiName := "delete_project"
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 		projectId, _ := strconv.Atoi(p.ByName("projectId"))
@@ -28,10 +29,12 @@ func DeleteProjectHandler(repository repository.ProjectRepository) httprouter.Ha
 			}
 
 			utils.ReturnErrorResponse(r.Context(), w, httpCode, responseBody, err)
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
 		responseBody := utils.GenericResponse[DeleteProjectResponseData]{Success: true}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
+		utils.IncrementApiSuccessMetric(apiName)
 	}
 }

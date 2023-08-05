@@ -21,6 +21,7 @@ type CreateItemResponseData struct {
 }
 
 func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
+	apiName := "create_item"
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		var requestBody CreateItemRequestBody
 
@@ -28,18 +29,21 @@ func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		if err != nil {
 			responseBody := utils.GenericResponse[CreateItemResponseData]{Success: false, Error: "invalid_request_format"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, err)
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
 		if requestBody.Name == nil || requestBody.Description == nil {
 			responseBody := utils.GenericResponse[CreateItemResponseData]{Success: false, Error: "name_or_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_or_description_empty"))
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
 		if *requestBody.Name == "" || *requestBody.Description == "" {
 			responseBody := utils.GenericResponse[CreateItemResponseData]{Success: false, Error: "name_or_description_empty"}
 			utils.ReturnErrorResponse(r.Context(), w, 400, responseBody, errors.New("name_or_description_empty"))
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
@@ -54,10 +58,12 @@ func CreateItemHandler(repository repository.ItemRepository) httprouter.Handle {
 		if err != nil {
 			responseBody := utils.GenericResponse[CreateItemResponseData]{Success: false, Error: "internal_db_error"}
 			utils.ReturnErrorResponse(r.Context(), w, 500, responseBody, err)
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
 		responseBody := utils.GenericResponse[CreateItemResponseData]{Success: true, Data: CreateItemResponseData{ItemID: item.ID}}
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
+		utils.IncrementApiSuccessMetric(apiName)
 	}
 }

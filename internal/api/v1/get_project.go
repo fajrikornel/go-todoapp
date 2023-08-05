@@ -24,6 +24,7 @@ type ItemResponse struct {
 }
 
 func GetProjectHandler(repository repository.ProjectRepository) httprouter.Handle {
+	apiName := "get_project"
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 		projectId, _ := strconv.Atoi(p.ByName("projectId"))
@@ -38,11 +39,13 @@ func GetProjectHandler(repository repository.ProjectRepository) httprouter.Handl
 			}
 
 			utils.ReturnErrorResponse(r.Context(), w, httpCode, responseBody, err)
+			utils.IncrementApiErrorMetric(apiName, responseBody.Error)
 			return
 		}
 
 		responseBody := buildGetProjectResponseBody(project)
 		utils.ReturnSuccessResponse(r.Context(), w, responseBody)
+		utils.IncrementApiSuccessMetric(apiName)
 	}
 }
 
