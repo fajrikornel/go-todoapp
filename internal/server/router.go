@@ -3,9 +3,11 @@ package server
 import (
 	"github.com/fajrikornel/go-todoapp/internal/api"
 	"github.com/fajrikornel/go-todoapp/internal/api/v1"
+	"github.com/fajrikornel/go-todoapp/internal/metrics"
 	"github.com/fajrikornel/go-todoapp/internal/middleware"
 	"github.com/fajrikornel/go-todoapp/internal/repository"
 	"github.com/julienschmidt/httprouter"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 )
 
@@ -21,6 +23,13 @@ func GetRouter(pRepository repository.ProjectRepository, iRepository repository.
 	router.PATCH("/v1/projects/:projectId/:itemId", middleware.LoggingMiddleware(v1.UpdateItemHandler(iRepository)))
 	router.DELETE("/v1/projects/:projectId", middleware.LoggingMiddleware(v1.DeleteProjectHandler(pRepository)))
 	router.DELETE("/v1/projects/:projectId/:itemId", middleware.LoggingMiddleware(v1.DeleteItemHandler(iRepository)))
+
+	router.Handler("GET", "/metrics", promhttp.HandlerFor(
+		metrics.GetGatherer(),
+		promhttp.HandlerOpts{
+			Registry: metrics.GetRegisterer(),
+		}),
+	)
 
 	return router
 }

@@ -10,6 +10,8 @@ cp config/application.yml.sample config/application.yml
 
 If you are not using the docker-compose environment, modify the values accordingly.
 
+Log and metrics monitoring config rest in the `filebeat.docker.yml` and `prometheus.yml` in the /config folder respectively.
+
 ### Execute DB migrations
 
 Activate the DB and test DB
@@ -54,6 +56,11 @@ To run it with the docker-compose environment and with log monitoring:
 docker-compose up -d --build app db elasticsearch kibana filebeat
 ```
 
+To run it with the docker-compose environment and with metrics monitoring:
+```
+docker-compose up -d --build app db prometheus
+```
+
 To run it without the docker-compose environment:
 ```
 go build -o build/server cmd/server/server.go
@@ -74,13 +81,21 @@ curl localhost:8080/v1/projects/1
 ```
 For API details, see the Swagger file in the api/ folder of this repo.
 
-Log monitoring:
+Provided that the monitoring stack is turned on (see above instructions),
+
+- Log monitoring:
 ```
 1. Visit Kibana on localhost:5601 using a browser
 2. Go to side pane > Analytics > Discover
 3. Observe or query the logs
 ```
-Provided that the monitoring stack is turned on (see above instructions).
+
+- Metrics monitoring:
+```
+1. Visit prometheus UI on localhost:9090
+2. Query the metrics using PromQL
+```
+
 
 ### Author notes
 

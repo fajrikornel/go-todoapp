@@ -88,6 +88,19 @@ services:
       elasticsearch:
         condition: service_healthy
 
+  prometheus:
+    image: "prom/prometheus:v2.37.9"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      app:
+        condition: service_started
+    networks:
+      - app-network
+      - monitoring-network
+
 networks:
   app-network: {}
   monitoring-network: {}
