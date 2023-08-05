@@ -3,6 +3,7 @@ module github.com/fajrikornel/go-todoapp
 go 1.20
 
 require (
+	github.com/gobeam/stringy v0.0.6
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
 	github.com/julienschmidt/httprouter v1.3.0
