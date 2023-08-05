@@ -93,6 +93,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
+      - ./.docker-data/prometheus:/prometheus
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
       app:
