@@ -1,6 +1,11 @@
 setup.kibana.host: "kibana:5601"
-output.elasticsearch.hosts:
-  - "elasticsearch:9200"
+output.elasticsearch:
+  hosts:
+    - "elasticsearch:9200"
+  index: "todoapp-%{+yyyy.MM.dd}"
+
+setup.template.name: "todoapp"
+setup.template.pattern: "todoapp-*"
 
 filebeat.inputs:
   - type: filestream
