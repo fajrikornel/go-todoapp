@@ -87,6 +87,12 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
+    healthcheck:
+      test: curl -s localhost:5601/status >/dev/null || exit 1
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
 
   prometheus:
     image: "prom/prometheus:v2.37.9"
