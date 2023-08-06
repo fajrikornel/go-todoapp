@@ -58,7 +58,7 @@ docker-compose up -d --build app db elasticsearch kibana filebeat
 
 To run it with the docker-compose environment and with metrics monitoring:
 ```
-docker-compose up -d --build app db prometheus
+docker-compose up -d --build app db prometheus grafana
 ```
 
 To run it without the docker-compose environment:
@@ -92,8 +92,10 @@ Provided that the monitoring stack is turned on (see above instructions),
 
 - Metrics monitoring:
 ```
-1. Visit prometheus UI on localhost:9090
-2. Query the metrics using PromQL
+1. Visit Grafana UI on localhost:3000
+2. For first time login, use `admin` user with the password as `admin` and change the password.
+3. Add a new Grafana data source as Prometheus type with the URL as http://prometheus:9090
+4. You can then add dashboards according to the metrics available in the app
 ```
 
 
@@ -102,6 +104,7 @@ Provided that the monitoring stack is turned on (see above instructions),
 In this project, I'm trying to create a service that is developed in a healthy way. Some of the traits I'm trying to achieve:
 - Development ease: tools to help local development; migration commands, dockerfiles, docker compose
 - Configurability: configure app via a YAML configuration
+- Instrumented with metrics and dashboards to monitor application-specific health
 - Well-documented: Swagger file, README instructions
 - Well-logged: logs can be correlated with related logs (via correlation ID)
 - Operability: logs can be monitored and queried for operability and debugging
@@ -111,5 +114,4 @@ In this project, I'm trying to create a service that is developed in a healthy w
 
 Some of the things in my mind that are not yet implemented:
 - Configuration via environment variables
-- Instrumentation (metrics, dashboards)
 - Deployment tools: CI/CD pipeline
