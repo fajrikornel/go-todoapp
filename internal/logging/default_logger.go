@@ -37,7 +37,7 @@ func (dl *DefaultLogger) errorf(ctx context.Context, format string, args ...inte
 	if args == nil {
 		log.defaultAddLogMessage(format)
 	} else {
-		log.defaultAddLogMessage(format, args)
+		log.defaultAddLogMessage(format, args...)
 	}
 	log.defaultAddCorrelationId(ctx)
 	log.defaultAddTimestamp()
