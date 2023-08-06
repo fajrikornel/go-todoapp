@@ -1,45 +1,50 @@
 package config
 
 import (
-	"gopkg.in/yaml.v3"
-	"log"
-	"os"
+	"github.com/spf13/viper"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 type Config struct {
-	AppPort         int      `yaml:"APP_PORT"`
-	EnableZapLogger bool     `yaml:"ENABLE_ZAP_LOGGER"`
-	DbConfig        DbConfig `yaml:"DB_CONFIG"`
-	TestDbConfig    DbConfig `yaml:"TEST_DB_CONFIG"`
+	AppPort         int      `mapstructure:"APP_PORT"`
+	EnableZapLogger bool     `mapstructure:"ENABLE_ZAP_LOGGER"`
+	DbConfig        DbConfig `mapstructure:"DB_CONFIG"`
+	TestDbConfig    DbConfig `mapstructure:"TEST_DB_CONFIG"`
 }
 
 type DbConfig struct {
-	DbHost     string `yaml:"DB_HOST"`
-	DbName     string `yaml:"DB_NAME"`
-	DbPort     int    `yaml:"DB_PORT"`
-	DbUsername string `yaml:"DB_USERNAME"`
-	DbPassword string `yaml:"DB_PASSWORD"`
+	DbHost     string `mapstructure:"DB_HOST"`
+	DbName     string `mapstructure:"DB_NAME"`
+	DbPort     int    `mapstructure:"DB_PORT"`
+	DbUsername string `mapstructure:"DB_USERNAME"`
+	DbPassword string `mapstructure:"DB_PASSWORD"`
 }
 
-var config Config
+var config *Config
 
 func init() {
-	config = Config{}
+	config = &Config{}
 
 	_, b, _, _ := runtime.Caller(0)
 	path := filepath.Dir(b)
-	file, err := os.Open(path + "/../../config/application.yml")
+	viper.AddConfigPath(path + "/../../config")
+	viper.SetConfigName("application")
+	viper.SetConfigType("yml")
+
+	viper.AutomaticEnv()
+	viper.SetEnvPrefix("todoapp")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(`.`, `_`))
+
+	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatalf("NO APPLICATION YML FILE, %v", err)
+		panic(err)
 	}
-	defer file.Close()
 
-	d := yaml.NewDecoder(file)
-
-	if err := d.Decode(&config); err != nil {
-		log.Fatalf("CANNOT DECODE CONFIG, %v", err)
+	err = viper.Unmarshal(config)
+	if err != nil {
+		panic(err)
 	}
 }
 

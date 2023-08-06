@@ -6,6 +6,8 @@ services:
       - "8080:8080"
     volumes:
       - ./.docker-data/app:/app/logs
+    environment:
+      TODOAPP_DB_CONFIG_DB_HOST: "db"
     networks:
       - app-network
     build:

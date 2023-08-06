@@ -10,6 +10,9 @@ cp config/application.yml.sample config/application.yml
 
 If you are not using the docker-compose environment, modify the values accordingly.
 
+The configs set on `config/application.yml` can be overriden with environment variables.
+Set the environment variable with `TODOAPP_` as a prefix. For nested structures exampled by the YAML config, replace `.` with `_` (`DB_CONFIG.DB_HOST` becomes `TODOAPP_DB_CONFIG_DB_HOST`)
+
 Log and metrics monitoring config rest in the `filebeat.docker.yml` and `prometheus.yml` in the /config folder respectively.
 
 ### Execute DB migrations
@@ -103,7 +106,7 @@ Provided that the monitoring stack is turned on (see above instructions),
 
 In this project, I'm trying to create a service that is developed in a healthy way. Some of the traits I'm trying to achieve:
 - Development ease: tools to help local development; migration commands, dockerfiles, docker compose
-- Configurability: configure app via a YAML configuration
+- Configurability: configure app via a YAML configuration and override it via environment variables
 - Instrumented with metrics and dashboards to monitor application-specific health
 - Well-documented: Swagger file, README instructions
 - Well-logged: logs can be correlated with related logs (via correlation ID)
@@ -113,5 +116,4 @@ In this project, I'm trying to create a service that is developed in a healthy w
 - Equipped with good unit tests with good testing structure/framework
 
 Some of the things in my mind that are not yet implemented:
-- Configuration via environment variables
 - Deployment tools: CI/CD pipeline
